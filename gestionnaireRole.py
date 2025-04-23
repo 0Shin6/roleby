@@ -38,14 +38,24 @@ class GestionnaireRole(commands.Cog):
 
     # 3 - Ajout du rôle "Non vérifié" aux nouveaux membres
     @commands.Cog.listener()
-    async def on_member_join(self, member):
+    async def on_member_join(self, member): #Problème de message
+        idVerification = "1364602013509357568"
         try:
             role = discord.utils.get(member.guild.roles, name="Non vérifié")
             if role:
                 await member.add_roles(role)
-                print("Rôle 'Non vérifié' ajouté à", member.display_name)
+                print("Rôle 'Non vérifié' donné à", member.display_name)
+
+            # Envoyer un message dans le salon vérification
+            salon = member.guild.get_channel(idVerification)
+            if salon:
+                message = await salon.send(
+                    "Bienvenue", member.mention, "!"
+                    "\nRéagis avec la réaction ce dessous pour valider ton arrivée et obtenir l’accès complet."
+                )
+                await message.add_reaction("✅")
         except Exception as e:
-            print("Erreur ajout rôle 'Non vérifié' :", e)
+            print("Erreur lors de l’arrivée d’un membre :", e)
 
     # 4 - Gestion des réactions
     async def gestionRoleReaction(self, payload, ajouter=True):
