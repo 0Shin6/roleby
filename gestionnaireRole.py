@@ -102,7 +102,7 @@ class GestionnaireRole(commands.Cog):
         salon = discord.utils.get(guild.text_channels, id=1358417427716640878)
         if not salon:
             print("Salon introuvable")
-            return
+            return None
 
         # Cas : serveur a changé (donc message invalide)
         if self.guild_id != guild.id:
@@ -140,3 +140,24 @@ class GestionnaireRole(commands.Cog):
             print("Nouveau message créé et sauvegardé")
         except Exception as e:
             print("Erreur lors de l'envoi du message de rôle :", e)
+
+    # 8 - Ajout du rôle booster si l'utilisateur booste le serveur
+    @commands.Cog.listener()
+    async def on_member_update(self, before, after):
+        try:
+            # Si le membre a commencé à booster
+            if not before.premium_since and after.premium_since:
+                booster_role = discord.utils.get(after.guild.roles, name="Booster")
+                if booster_role:
+                    await after.add_roles(booster_role)
+                    print(f"{after.display_name} a boosté le serveur. Rôle attribué.")
+            
+            # Si le membre a arrêté de booster
+            elif before.premium_since and not after.premium_since:
+                booster_role = discord.utils.get(after.guild.roles, name="Server Booster")
+                if booster_role and booster_role in after.roles:
+                    await after.remove_roles(booster_role)
+                    print(f"{after.display_name} a arrêté de booster. Rôle retiré.")
+        
+        except Exception as e:
+            print("Erreur lors de l'ajout ou retrait du rôle booster :", e)
