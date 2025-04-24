@@ -139,9 +139,11 @@ class GestionnaireRole(commands.Cog):
         try:
             message = await salon.send(
                 "**__Réagis pour obtenir un rôle :__**\n\n"
-                "💪 = Muscu\n"
-                "📖 = Lecture\n"
-                "👔 = Fashion"
+                "🦧 : 14\n"
+                "👦 : 15\n"
+                "🗿 : 16\n"
+                "💪 : 17\n"
+                "👨‍🦰 : 18+\n"
             )
             for emoji in dictionnaireEmojies().keys():
                 await message.add_reaction(emoji)

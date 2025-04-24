@@ -1,7 +1,9 @@
 #dictionnaire d'émojie du bot
 def dictionnaireEmojies():
     return {
-        "💪": "Muscu",
-        "📖": "Lecture",
-        "👔": "Fashion"
+        "🦧" : "14",
+        "👦" : "15",
+        "🗿" : "16",
+        "💪" : "17",
+        "👨‍🦰" : "18 +",
     }
