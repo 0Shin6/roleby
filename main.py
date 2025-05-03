@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import os
 
 from gestionnaireRole import GestionnaireRole  
+from gestionnaireCommande import GestionnaireCommande
 
 # 1 - Chargement des variables d’environnement
 load_dotenv()
@@ -19,11 +20,7 @@ if mon_token is None:
     
 
 # 2 - Définir les intents
-intents = discord.Intents.default()
-intents.message_content = True
-intents.members = True
-intents.reactions = True
-intents.guilds = True
+intents = discord.Intents.all()
 
 # 3 - Initialisation du bot
 bot = commands.Bot(command_prefix="!", intents=intents)
@@ -31,6 +28,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 # 4 - Fonction setup pour charger les Cogs
 async def setup():
     await bot.add_cog(GestionnaireRole(bot))
+    await bot.add_cog(GestionnaireCommande(bot))
 
 # 5 - Fonction principale (exécution du bot)
 async def main():

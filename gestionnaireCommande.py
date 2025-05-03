@@ -35,10 +35,46 @@ class GestionnaireCommande(commands.Cog):
             if len(emojis) != len(options):
                 await ctx.send("Le nombre d'emojis ne correspond pas au nombre d'options.")
                 return None
-        #écriture de la durée du sondage (en seconde)
-        await ctx.send("Quelle est la durée du sondage ? *en seconde*")
-        dureeMessage = await self.bot.wait_for('message', check=check, timeout=45)
-        duree = int(dureeMessage)
+            #écriture de la durée du sondage (en seconde)
+            await ctx.send("Quelle est la durée du sondage ? *en seconde*")
+            saisieDuree = await self.bot.wait_for('message', check=check, timeout=45)
+            duree = int(saisieDuree)
 
+            #préparation du message de sondage
+                #mise en place de la description (= options de réponse)
+            description = (f"{emojis[i]} : {options[i]}" for i in range(len(options)))
+                #structuration du message (= sujet, option et auteur)
+            message = discord.Embed(title=sujet, description=description, color=discord.Color.blue())
+            message.set_footer(text=f"sondage lancé par {ctx.author.display_name}")
 
-#Commandes : !sondage
+            #envoie du message
+            messageSondage = await ctx.send(message=message)
+
+            #ajout des réaction sous le sondage
+            for emoji in emojis:
+                await messageSondage.add_reaction(emoji)
+
+            #ajout du timer 
+            await asyncio.sleep(duree)
+
+            message = await ctx.channel.fetch_message(messageSondage.id)
+            resultat = {}
+
+            #comptage des résultats
+            for reaction in message.reactions:
+                emoji = reaction.emoji
+                if emoji in emojis:
+                    resultat[emoji] = reaction.count - 1
+            
+            #déduction du gagnant
+            if resultat:
+                gagnant = max(resultat.items(), key=lambda item: item[1])
+                await ctx.send(f"Fin du sondage : \n Le choix {gagnant[0]} l’emporte avec {gagnant[1]} votes.")
+            else:
+                await ctx.send("Sondage annulé : aucun vote réalisé")
+
+        except Exception as e:
+            await ctx.send("Une erreur est survenue", e)                
+    
+async def setup(bot):
+    await bot.add_cog(GestionnaireCommande(bot))
