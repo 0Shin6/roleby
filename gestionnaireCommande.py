@@ -38,17 +38,17 @@ class GestionnaireCommande(commands.Cog):
             #écriture de la durée du sondage (en seconde)
             await ctx.send("Quelle est la durée du sondage ? *en seconde*")
             saisieDuree = await self.bot.wait_for('message', check=check, timeout=45)
-            duree = int(saisieDuree)
+            duree = int(saisieDuree.content)
 
             #préparation du message de sondage
                 #mise en place de la description (= options de réponse)
-            description = (f"{emojis[i]} : {options[i]}" for i in range(len(options)))
+            description = "\n".join(f"{emojis[i]} : {options[i]}" for i in range(len(options)))
                 #structuration du message (= sujet, option et auteur)
             message = discord.Embed(title=sujet, description=description, color=discord.Color.blue())
             message.set_footer(text=f"sondage lancé par {ctx.author.display_name}")
 
             #envoie du message
-            messageSondage = await ctx.send(message=message)
+            messageSondage = await ctx.send(embed=message)
 
             #ajout des réaction sous le sondage
             for emoji in emojis:
@@ -68,13 +68,16 @@ class GestionnaireCommande(commands.Cog):
             
             #déduction du gagnant
             if resultat:
-                gagnant = max(resultat.items(), key=lambda item: item[1])
-                await ctx.send(f"Fin du sondage : \n Le choix {gagnant[0]} l’emporte avec {gagnant[1]} votes.")
-            else:
-                await ctx.send("Sondage annulé : aucun vote réalisé")
+                gagnant = max(resultat.items(), key=lambda item: item[0])
+
+                if gagnant[1] != 0:
+                    await ctx.send(f"Fin du sondage : \n Le choix {gagnant[0]} l’emporte avec {gagnant[1]} votes.")
+                else:
+                    await ctx.send("Sondage annulé : aucun vote réalisé")
 
         except Exception as e:
             await ctx.send("Une erreur est survenue", e)                
     
 async def setup(bot):
     await bot.add_cog(GestionnaireCommande(bot))
+    print("Gestionnaire de commande prêt.")
