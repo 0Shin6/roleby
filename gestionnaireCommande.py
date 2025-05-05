@@ -10,33 +10,40 @@ class GestionnaireCommande(commands.Cog):
     #commande !sondage
     async def sondage(self, ctx):
         def check(msg):
-            return msg.author == ctx.author and msg.channel == ctx.channel
+            return msg.author == ctx.author and isinstance(msg.channel, discord.DMChannel)
         
+      
         try:
+            #Procédure de création du sondage fait en DM
+            try:
+                await ctx.author.send("Bien reçu ! Creéation du sondage.")
+            except discord.Forbidden:
+                await ctx.send("Je ne peux pas vous envoyer de message privé. Activez vos DMs et réessayer.")
+                return None
             #écriture du titre du sondage
-            await ctx.send("Quel est le titre du sondage ?")
+            await ctx.author.send("Quel est le titre du sondage ?")
             sujetMessage =await self.bot.wait_for('message', check=check, timeout=80)
             sujet = sujetMessage.content
 
             #écriture des options du sondage
-            await ctx.send("Entrez les options du sondage (séparées par des virgules `,`).")
+            await ctx.author.send("Entrez les options du sondage (séparées par des virgules `,`).")
             optionMessage = await self.bot.wait_for('message', check=check, timeout=80)
             options = [opt.strip() for opt in optionMessage.content.split(',') if opt.strip()]
 
             if len(options) < 2:
-                await ctx.send("il doit y avoir au minimum 2 options et au maximum 10.")
+                await ctx.author.send("il doit y avoir au minimum 2 options et au maximum 10.")
                 return None
 
             #écriture des émojies associés aux options
-            await ctx.send("Donnez les emojies à utiliser pour les sondages (séparés par des espaces).")
+            await ctx.author.send("Donnez les emojies à utiliser pour les sondages (séparés par des espaces).")
             emojiMessage = await self.bot.wait_for('message', check=check, timeout=60)
             emojis = emojiMessage.content.split()
 
             if len(emojis) != len(options):
-                await ctx.send("Le nombre d'emojis ne correspond pas au nombre d'options.")
+                await ctx.author.send("Le nombre d'emojis ne correspond pas au nombre d'options.")
                 return None
             #écriture de la durée du sondage (en seconde)
-            await ctx.send("Quelle est la durée du sondage ? *en seconde*")
+            await ctx.author.send("Quelle est la durée du sondage ? *en seconde*")
             saisieDuree = await self.bot.wait_for('message', check=check, timeout=45)
             duree = int(saisieDuree.content)
 
@@ -76,7 +83,7 @@ class GestionnaireCommande(commands.Cog):
                     await ctx.send("Sondage annulé : aucun vote réalisé")
 
         except Exception as e:
-            await ctx.send("Une erreur est survenue", e)                
+            await ctx.author.send("Une erreur est survenue", e)                
     
 async def setup(bot):
     await bot.add_cog(GestionnaireCommande(bot))
