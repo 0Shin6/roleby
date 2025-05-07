@@ -6,13 +6,14 @@ class GestionnaireCommande(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    ##########################
+    #--- Commande sondage ---#
+    ##########################
     @commands.command(name="sondage")
-    #commande !sondage
     async def sondage(self, ctx):
         def check(msg):
             return msg.author == ctx.author and isinstance(msg.channel, discord.DMChannel)
-        
-      
+    
         try:
             #Procédure de création du sondage fait en DM
             try:
@@ -85,6 +86,43 @@ class GestionnaireCommande(commands.Cog):
         except Exception as e:
             await ctx.author.send("Une erreur est survenue", e)                
     
+    #######################
+    #--- Commande help ---#
+    #######################
+    @commands.command(name="aide")
+    async def aide(self, ctx):
+        #tête de message
+        message = discord.Embed(
+            title = " __**Mode d'emploi du bot**__",
+            description = "Voici les commandes disponibles :",
+            color = discord.Color.dark_purple())
+
+        #corps du message
+        # 1ere rubrique
+        message.add_field(
+            name="__*!sondage*__",
+            value = 
+                "Lance la création d'un sondage __en DM__.\n"
+                "Le sondage est ensuite affiché dans le salon d'où la commande a été lancée.", inline=False)
+
+        #2e rubrique
+        message.add_field(
+            name = "Fonctionnement du sondage",
+            value = 
+                "**1** - Le bot vous pose ces questions en DM : \n"
+                "---a - le titre du sondage\n"
+                "---b - les options de réponses\n"
+                "---c - les émojies correspondant\n"
+                "---d - la durée du sondage __en secondes__\n"
+                "**2** - Une fois tout validé, le sondage s’affiche dans le salon.\n"
+                "**3** - Le bot ajoute les réactions.\n"
+                "**4** - À la fin du temps, le résultat est automatiquement annoncé.", inline=False)
+
+        #fin du message
+        message.set_footer(text="Bot réalisé par @.shin60 :-)")
+        await ctx.send(embed=message)
+
+
 async def setup(bot):
     await bot.add_cog(GestionnaireCommande(bot))
     print("Gestionnaire de commande prêt.")
