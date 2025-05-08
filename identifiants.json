@@ -1,11 +1,14 @@
 {
-  "1358406594056159283": {
-    "idMessageRole": 1364959272844394516,
-    "idVerification": 1367439122234347611
-  },
-  
-  "1367620312744591442": {
-    "idMessageRole": 0,
-    "idVerification": 0
-  }
+    "1358406594056159283": {
+        "idMessageRole": 1370061797956259974,
+        "idVerification": 1370061810576920758,
+        "idSalonRole": 1358417427716640878,
+        "idSalonVerification": 1364602013509357568
+    },
+    "1367620312744591442": {
+        "idMessageRole": 1370061814112714924,
+        "idVerification": 1370061827295285358,
+        "idSalonRole": 1367933832849915944,
+        "idSalonVerification": 1367621796882284705
+    }
 }

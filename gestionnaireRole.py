@@ -4,16 +4,16 @@ import os
 from dictionnaireEmojies import *
 import json
 
-idJson = "serveur_config.json"
+idJson = "identifiants.json"
 
-#1a - chargement du fichier json
+#1a - Chargement du fichier JSON
 def charger_config():
     if os.path.exists(idJson):
         with open(idJson, "r") as f:
             return json.load(f)
     return {}
 
-#1b - sauvegarde du fichier json
+#1b - Sauvegarde du fichier JSON
 def sauvegarder_config(data):
     with open(idJson, "w") as f:
         json.dump(data, f, indent=4)
@@ -22,7 +22,7 @@ class GestionnaireRole(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.configs = charger_config()
-
+    
     #2a - prend l'ID des différents serveur où le bot se trouve
     def get_config(self, guild_id):
         return self.configs.get(str(guild_id), {})
@@ -35,7 +35,7 @@ class GestionnaireRole(commands.Cog):
         self.configs[guild][key] = value
         sauvegarder_config(self.configs)
 
-    # 3a - ajout du rôle "non vérifié" aux nouveaux membres
+    #3a - ajout du rôle "non vérifié" aux nouveaux membres
     @commands.Cog.listener()
     async def on_member_join(self, member):
         try:
@@ -46,10 +46,10 @@ class GestionnaireRole(commands.Cog):
         except Exception as e:
             print("Erreur lors de l’arrivée d’un membre :", e)
 
-    # 3b - mise en place du gestionnaire de réaction
+    #3b - mise en place du gestionnaire de réaction
     async def gestionRoleReaction(self, payload, ajouter=True):
         config = self.get_config(payload.guild_id)
-        if payload.message_id != config.get("message_role"):
+        if payload.message_id != config.get("idMessageRole"):
             return None
         try:
             serveur = self.bot.get_guild(payload.guild_id)
@@ -70,28 +70,28 @@ class GestionnaireRole(commands.Cog):
         except Exception as e:
             print("Erreur gestion des rôles :", e)
 
-    # 3c - ajout du rôle "Vérifié" lorsque l'utilisateur coche la réaction. Retrait du rôle "non vérifié" en simultanée
+     #3c - ajout du rôle "Vérifié" lorsque l'utilisateur coche la réaction. Retrait du rôle "non vérifié" en simultanée
     async def gestionVerification(self, payload):
         config = self.get_config(payload.guild_id)
-        if payload.message_id != config.get("message_verification") or str(payload.emoji.name) != "✅":
+        if payload.message_id != config.get("idVerification") or str(payload.emoji.name) != "✅":
             return None
         try:
             serveur = self.bot.get_guild(payload.guild_id)
             membre = serveur.get_member(payload.user_id)
 
-            role_verifie = discord.utils.get(serveur.roles, name="Vérifié")
-            role_nonverif = discord.utils.get(serveur.roles, name="Non vérifié")
+            verifie = discord.utils.get(serveur.roles, name="Vérifié")
+            nonVerifie = discord.utils.get(serveur.roles, name="Non vérifié")
 
             if membre:
-                if role_verifie:
-                    await membre.add_roles(role_verifie)
-                if role_nonverif:
-                    await membre.remove_roles(role_nonverif)
+                if verifie:
+                    await membre.add_roles(verifie)
+                if nonVerifie:
+                    await membre.remove_roles(nonVerifie)
                 print(f"{membre.display_name} est maintenant vérifié.")
         except Exception as e:
             print("Erreur gestion vérification :", e)
 
-    # 4 - mise en place des écouteurs
+    #4 - mise en place des écouteurs
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         await self.gestionRoleReaction(payload, ajouter=True)
@@ -101,37 +101,50 @@ class GestionnaireRole(commands.Cog):
     async def on_raw_reaction_remove(self, payload):
         await self.gestionRoleReaction(payload, ajouter=False)
 
-    # 5 - connexion du bot 
+    #5 - connexion du bot 
     @commands.Cog.listener()
     async def on_ready(self):
         print("GestionnaireRole prêt. Connecté en tant que :", self.bot.user)
-        if not self.bot.guilds:
-            print("Aucun serveur détecté.")
-            return
 
         for guild in self.bot.guilds:
-            salonRoles = discord.utils.get(guild.text_channels, id=1358417427716640878)
-            salonVerification = discord.utils.get(guild.text_channels, id=1364602013509357568)
-
             config = self.get_config(guild.id)
 
-            idMessageRole = config.get("idMessageRole")
-            idVerification = config.get("idVerification")
+            salonRole = discord.utils.get(guild.text_channels, id=config.get("idSalonRole"))
+            salonVerif = discord.utils.get(guild.text_channels, id=config.get("idSalonVerification"))
 
-            if not idMessageRole:
-                await self.creationMessageRole(salonRoles, guild)
+            if not config.get("idMessageRole"):
+                if salonRole:
+                    await self.creationMessageRole(salonRole, guild.id)
+                else:
+                    print(f"Salon de rôles introuvable pour le serveur {guild.name}")
+
             else:
                 try:
-                    await salonRoles.fetch_message(idMessageRole)
-                    print("Message de rôles récupéré.")
-                except discord.NotFound:
-                    await self.creationMessageRole(salonRoles, guild)
+                    await salonRole.fetch_message(config.get("idMessageRole"))
+                    print("Message de rôles existant récupéré.")
+                except Exception as e:
+                    print("Message de rôles non trouvé, recréation...", e)
+                    await self.creationMessageRole(salonRole, guild.id)
 
-            if not idVerification:
-                await self.creationMessageVerification(salonVerification, guild)
+            if not config.get("idVerification"):
+                if salonVerif:
+                    await self.creationMessageVerification(salonVerif, guild.id)
+                else:
+                    print(f"Salon de vérification introuvable pour le serveur {guild.name}")
 
-    # 6b - création des messages rôle
-    async def creationMessageRole(self, salon, guild):
+            else:
+                try:
+                    await salonVerif.fetch_message(config.get("idVerification"))
+                    print("Message de vérification existant récupéré.")
+                except Exception as e:
+                    print("Message de vérification non trouvé, recréation...", e)
+                    await self.creationMessageVerification(salonVerif, guild.id)
+
+    #6b - création des messages rôle
+    async def creationMessageRole(self, salon, guild_id):
+        if salon is None:
+            print("Salon de rôle est None.")
+            return
         try:
             message = await salon.send(
                 "**__Réagis pour obtenir un rôle :__**\n\n"
@@ -144,19 +157,22 @@ class GestionnaireRole(commands.Cog):
             for emoji in dictionnaireEmojies().keys():
                 await message.add_reaction(emoji)
 
-            self.set_config(guild.id, "message_role", message.id)
+            self.set_config(guild_id, "idMessageRole", message.id)
             print("Message de rôle envoyé.")
         except Exception as e:
             print("Erreur création message rôle :", e)
 
-    # 7 - Création message vérification
-    async def creationMessageVerification(self, salon, guild):
+    #7 - Création message vérification
+    async def creationMessageVerification(self, salon, guild_id):
+        if salon is None:
+            print("Salon de vérification est None.")
+            return
         try:
             message = await salon.send(
                 "Bienvenue ! Réagis avec ✅ pour être vérifié et accéder au serveur."
             )
             await message.add_reaction("✅")
-            self.set_config(guild.id, "message_verification", message.id)
+            self.set_config(guild_id, "idVerification", message.id)
             print("Message de vérification envoyé.")
         except Exception as e:
             print("Erreur création message vérification :", e)
