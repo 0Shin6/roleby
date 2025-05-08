@@ -2,52 +2,38 @@ import discord
 from discord.ext import commands
 import os
 from dictionnaireEmojies import *
+import json
+
+idJson = "serveur_config.json"
+
+#1a - chargement du fichier json
+def charger_config():
+    if os.path.exists(idJson):
+        with open(idJson, "r") as f:
+            return json.load(f)
+    return {}
+
+#1b - sauvegarde du fichier json
+def sauvegarder_config(data):
+    with open(idJson, "w") as f:
+        json.dump(data, f, indent=4)
 
 class GestionnaireRole(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.id_message_role = self.chargement_id_messages()
-        self.guild_id = self.chargement_id_guild()
-        self.id_verification = self.chargement_id_verification()
+        self.configs = charger_config()
 
-    # 1 - chargements des différents id
-    def chargement_id_messages(self):
-        if os.path.exists("identifiantMessage.txt"):
-            with open("identifiantMessage.txt", "r") as f:
-                contenu = f.read().strip()
-                if contenu.isdigit():
-                    return int(contenu)
-        return None
+    #2a - prend l'ID des différents serveur où le bot se trouve
+    def get_config(self, guild_id):
+        return self.configs.get(str(guild_id), {})
 
-    def chargement_id_guild(self):
-        if os.path.exists("guild_id.txt"):
-            with open("guild_id.txt", "r") as f:
-                contenu = f.read().strip()
-                if contenu.isdigit():
-                    return int(contenu)
-        return None
-
-    def chargement_id_verification(self):
-        if os.path.exists("identifiantVerification.txt"):
-            with open("identifiantVerification.txt", "r") as f:
-                contenu = f.read().strip()
-                if contenu.isdigit():
-                    return int(contenu)
-        return None
-
-    # 2 - sauvegarde des différents id
-    def sauvegarde_info(self, idMessage, idServeur):
-        with open("identifiantMessage.txt", "w") as f:
-            f.write(str(idMessage))
-        with open("guild_id.txt", "w") as f:
-            f.write(str(idServeur))
-        self.id_message_role = idMessage
-        self.guild_id = idServeur
-
-    def sauvegarde_verification(self, idMessage):
-        with open("identifiantVerification.txt", "w") as f:
-            f.write(str(idMessage))
-        self.id_verification = idMessage
+    #2b - mets à jour la configuration des serveurs
+    def set_config(self, guild_id, key, value):
+        guild = str(guild_id)
+        if guild not in self.configs:
+            self.configs[guild] = {}
+        self.configs[guild][key] = value
+        sauvegarder_config(self.configs)
 
     # 3a - ajout du rôle "non vérifié" aux nouveaux membres
     @commands.Cog.listener()
@@ -62,7 +48,8 @@ class GestionnaireRole(commands.Cog):
 
     # 3b - mise en place du gestionnaire de réaction
     async def gestionRoleReaction(self, payload, ajouter=True):
-        if payload.message_id != self.id_message_role:
+        config = self.get_config(payload.guild_id)
+        if payload.message_id != config.get("message_role"):
             return None
         try:
             serveur = self.bot.get_guild(payload.guild_id)
@@ -85,7 +72,8 @@ class GestionnaireRole(commands.Cog):
 
     # 3c - ajout du rôle "Vérifié" lorsque l'utilisateur coche la réaction. Retrait du rôle "non vérifié" en simultanée
     async def gestionVerification(self, payload):
-        if payload.message_id != self.id_verification or str(payload.emoji.name) != "✅":
+        config = self.get_config(payload.guild_id)
+        if payload.message_id != config.get("message_verification") or str(payload.emoji.name) != "✅":
             return None
         try:
             serveur = self.bot.get_guild(payload.guild_id)
@@ -121,23 +109,26 @@ class GestionnaireRole(commands.Cog):
             print("Aucun serveur détecté.")
             return
 
-        guild = self.bot.guilds[0]
+        for guild in self.bot.guilds:
+            salonRoles = discord.utils.get(guild.text_channels, id=1358417427716640878)
+            salonVerification = discord.utils.get(guild.text_channels, id=1364602013509357568)
 
-        salon_roles = discord.utils.get(guild.text_channels, id=1358417427716640878)
-        salon_verification = discord.utils.get(guild.text_channels, id=1364602013509357568)
+            config = self.get_config(guild.id)
 
-        # 6a - récupération du message rôle
-        if self.guild_id != guild.id or not self.id_message_role:
-            await self.creationMessageRole(salon_roles, guild)
-        else:
-            try:
-                await salon_roles.fetch_message(self.id_message_role)
-                print("Message de rôles récupéré.")
-            except discord.NotFound:
-                await self.creationMessageRole(salon_roles, guild)
+            idMessageRole = config.get("idMessageRole")
+            idVerification = config.get("idVerification")
 
-        if not self.id_verification:
-            await self.creationMessageVerification(salon_verification)
+            if not idMessageRole:
+                await self.creationMessageRole(salonRoles, guild)
+            else:
+                try:
+                    await salonRoles.fetch_message(idMessageRole)
+                    print("Message de rôles récupéré.")
+                except discord.NotFound:
+                    await self.creationMessageRole(salonRoles, guild)
+
+            if not idVerification:
+                await self.creationMessageVerification(salonVerification, guild)
 
     # 6b - création des messages rôle
     async def creationMessageRole(self, salon, guild):
@@ -153,19 +144,19 @@ class GestionnaireRole(commands.Cog):
             for emoji in dictionnaireEmojies().keys():
                 await message.add_reaction(emoji)
 
-            self.sauvegarde_info(message.id, guild.id)
+            self.set_config(guild.id, "message_role", message.id)
             print("Message de rôle envoyé.")
         except Exception as e:
             print("Erreur création message rôle :", e)
 
     # 7 - Création message vérification
-    async def creationMessageVerification(self, salon):
+    async def creationMessageVerification(self, salon, guild):
         try:
             message = await salon.send(
                 "Bienvenue ! Réagis avec ✅ pour être vérifié et accéder au serveur."
             )
             await message.add_reaction("✅")
-            self.sauvegarde_verification(message.id)
+            self.set_config(guild.id, "message_verification", message.id)
             print("Message de vérification envoyé.")
         except Exception as e:
             print("Erreur création message vérification :", e)
