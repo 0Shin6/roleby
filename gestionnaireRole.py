@@ -146,21 +146,31 @@ class GestionnaireRole(commands.Cog):
             print("Salon de rôle est None.")
             return
         try:
-            message = await salon.send(
-                "**__Réagis pour obtenir un rôle :__**\n\n"
-                "🦧 : 14\n"
-                "👦 : 15\n"
-                "🗿 : 16\n"
-                "💪 : 17\n"
-                "👨‍🦰 : 18+\n"
+            message = discord.Embed(
+                title="__**Sélectionne ton âge :__**",
+                description="__Sélectionne ton âge parmi :__\n\n"
+                            "🦧 : 14\n"
+                            "👦 : 15\n"
+                            "🗿 : 16\n"
+                            "💪 : 17\n"
+                            "👨‍🦰 : 18+",
+                color=discord.Color.orange()
             )
+            message.set_footer(text="Bot réalisé par @.Shin60 :-)")
+
+            # Envoi de l'embed et récupération du message envoyé
+            message = await salon.send(embed=message)
+
+            # Ajout des réactions à ce message
             for emoji in dictionnaireEmojies().keys():
                 await message.add_reaction(emoji)
 
+            # Sauvegarde de l'ID du message
             self.set_config(guild_id, "idMessageRole", message.id)
             print("Message de rôle envoyé.")
         except Exception as e:
             print("Erreur création message rôle :", e)
+
 
     #7 - Création message vérification
     async def creationMessageVerification(self, salon, guild_id):
@@ -194,3 +204,6 @@ class GestionnaireRole(commands.Cog):
                     print(f"{after.display_name} a arrêté de booster. Rôle retiré.")
         except Exception as e:
             print("Erreur gestion boost :", e)
+
+
+#adapter les rôles pour les serveurs, améliorer la présentation des messages, Ajouter la fonctionnalité de niveau
