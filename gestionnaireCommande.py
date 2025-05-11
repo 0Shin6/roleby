@@ -123,6 +123,36 @@ class GestionnaireCommande(commands.Cog):
         await ctx.send(embed=message)
 
 
+    #######################
+    #--- Commande role ---#
+    #######################
+    @commands.command(name="role")
+    @commands.has_permissions(administrator=True)
+    async def creationMessageRole(self, ctx):
+        def check(m):
+            return m.author == ctx.author and isinstance(m.channel, discord.DMChannel)
+
+        try:
+            await ctx.author.send("📝 Donne le **titre** du message de rôle :")
+            titre = await self.bot.wait_for("message", check=check, timeout=60)
+
+            await ctx.author.send("🧾 Donne la **description** (ou tape `skip` pour rien) :")
+            descriptionMessage = await self.bot.wait_for("message", check=check, timeout=60)
+            description = None if descriptionMessage.content.lower() == "skip" else descriptionMessage.content
+
+            await ctx.author.send(
+                "Donne les rôles avec leurs émojis, un par ligne sous ce format :\n"
+                "`emoji : NomDuRôle`\n"
+                "Exemple :\n"
+                "🦧 : 14\n👦 : 15"
+            )
+
+            #...
+
+        except Exception as e:
+            await ctx.author.send("❌ Une erreur est survenue. Vérifie bien ta saisie.")
+            print("Erreur dans la commande !role :", e)
+
 async def setup(bot):
     await bot.add_cog(GestionnaireCommande(bot))
     print("Gestionnaire de commande prêt.")
