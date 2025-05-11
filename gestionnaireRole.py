@@ -79,7 +79,7 @@ class GestionnaireRole(commands.Cog):
             serveur = self.bot.get_guild(payload.guild_id)
             membre = serveur.get_member(payload.user_id)
 
-            verifie = discord.utils.get(serveur.roles, name="Vérifié")
+            verifie = discord.utils.get(serveur.roles, name="Robynetos")
             nonVerifie = discord.utils.get(serveur.roles, name="Non vérifié")
 
             if membre:
@@ -147,7 +147,7 @@ class GestionnaireRole(commands.Cog):
             return
         try:
             message = discord.Embed(
-                title="__**Sélectionne ton âge :__**",
+                title="**__Sélectionne ton âge :__**",
                 description="__Sélectionne ton âge parmi :__\n\n"
                             "🦧 : 14\n"
                             "👦 : 15\n"
@@ -175,13 +175,20 @@ class GestionnaireRole(commands.Cog):
     #7 - Création message vérification
     async def creationMessageVerification(self, salon, guild_id):
         if salon is None:
-            print("Salon de vérification est None.")
-            return
+            print("Salon de vérification est inexistant.")
+            return None
         try:
-            message = await salon.send(
-                "Bienvenue ! Réagis avec ✅ pour être vérifié et accéder au serveur."
+            messageVerif = discord.Embed(
+                title="**__Vérification :__**",
+                description="Bienvenue ! Réagis avec ✅ pour être vérifié et accéder au serveur.",
+                color=discord.Color.green()
             )
+            messageVerif.set_footer(text="Bot réalisé par @.Shin60 :-)")
+
+            message = await salon.send(embed=messageVerif)
             await message.add_reaction("✅")
+
+            # Sauvegarde de l'ID du message
             self.set_config(guild_id, "idVerification", message.id)
             print("Message de vérification envoyé.")
         except Exception as e:

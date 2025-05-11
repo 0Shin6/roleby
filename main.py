@@ -40,4 +40,3 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 
-# à faire la prochaine fois : Ajout commandes, Ajout fonctionnalité concours, Ajout rôle server booster à quoi doit ressembler mon main ?
