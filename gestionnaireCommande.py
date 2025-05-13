@@ -127,7 +127,7 @@ class GestionnaireCommande(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def aideRole(self, ctx) :
         message = discord.Embed(
-            title = "**La commande !role",
+            title = "**La commande !role**",
             description = 
                 "La commande !role permet de créer un message de rôle réaction\n"
                 " il faut donner l'association emoji - rôle sous ce format :\n"
@@ -155,28 +155,59 @@ class GestionnaireCommande(commands.Cog):
             await ctx.author.send("Donne le **titre** du message de rôle :")
             titre = await self.bot.wait_for("message", check=check, timeout=60)
 
-            await ctx.author.send("🧾 Donne la **description** (ou tape `skip` pour rien) :")
+            await ctx.author.send("Donne la **description** (ou tape 'skip' pour rien) :")
             descriptionMessage = await self.bot.wait_for("message", check=check, timeout=60)
-            description = None if descriptionMessage.content.lower() == "skip" else descriptionMessage.content
+            if descriptionMessage.content.lower() == "skip":
+                description = None
+            else :
+                description = descriptionMessage.content
 
-            await ctx.author.send(
-                "Donner les rôles avec leurs émojis, un par ligne"
-            )
+            await ctx.author.send("Donner les rôles avec leurs émojis, un par ligne :")
+            
+            lignes = await self.bot.wait_for("message", check=check, time=150)
+            lignes = lignes.content.strip().split("\n")
 
+            contenu = ""
+            emojiRole = {}
+
+            for ligne in lignes:
+                if ":" in ligne:
+                    emoji, nomRole = ligne.split(":", 1)
+                    emoji = emoji.strip()
+                    contenu += f"{emoji} : {nomRole}\n"
+                    emojiRole[emoji] = nomRole
             #...
+            
 
         except Exception as e:
             await ctx.author.send(" Une erreur est survenue. Vérifie bien ta saisie.")
             print("Erreur dans la commande !role :", e)
+
+    ##############################
+    #--- commande information ---#
+    ##############################
+    @commands.command(name="information")
+    async def information(self, ctx) :
+        message = discord.Embed(
+            title = "**Informations sur le bot**",
+            description = 
+                "Salut, je suis le bot du serveur Robynet créer par , un youtubeur qui développe un communauté autour du développement personnel.\n"
+                "Mon but est globalement de gérer les rôles via notamment les rôles réactions.\n"
+                "De plus, le bot pourra à l'avenir gérer les niveaux, la boutique et également pouvoir organiser des concours.\n"
+                "Je suis entièrement développé par @.shin60. Si vous voulez plus d'informations relatives au bot ou alors le contacter pour en créer un n'hésitez pas !",
+
+            color = discord.Color.blue())
+
+        message.set_footer(text="Pour plus d'aide, faites !aide :)")
+        await ctx.send(embed=message) 
+
 
 async def setup(bot):
     await bot.add_cog(GestionnaireCommande(bot))
     print("Gestionnaire de commande prêt.")
 
 
-##############################
-#--- commande information ---#
-##############################
+   
 
 
 
