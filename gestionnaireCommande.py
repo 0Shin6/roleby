@@ -86,42 +86,61 @@ class GestionnaireCommande(commands.Cog):
         except Exception as e:
             await ctx.author.send("Une erreur est survenue", e)                
     
-    #######################
-    #--- Commande help ---#
-    #######################
+    ########################
+    #--- Commandes aide ---#
+    ########################
     @commands.command(name="aide")
     async def aide(self, ctx):
         #tête de message
         message = discord.Embed(
             title = " __**Mode d'emploi du bot**__",
             description = "Voici les commandes disponibles :",
-            color = discord.Color.dark_purple())
+            color = discord.Color.red())
 
         #corps du message
-        # 1ere rubrique
         message.add_field(
-            name="__*!sondage*__",
+            name="Pour quelle commande avez-vous besoin d'aide ?",
             value = 
-                "Lance la création d'un sondage __en DM__.\n"
-                "Le sondage est ensuite affiché dans le salon d'où la commande a été lancée.", inline=False)
-
-        #2e rubrique
-        message.add_field(
-            name = "Fonctionnement du sondage",
-            value = 
-                "**1** - Le bot vous pose ces questions en DM : \n"
-                "---a - le titre du sondage\n"
-                "---b - les options de réponses\n"
-                "---c - les émojies correspondant\n"
-                "---d - la durée du sondage __en secondes__\n"
-                "**2** - Une fois tout validé, le sondage s’affiche dans le salon.\n"
-                "**3** - Le bot ajoute les réactions.\n"
-                "**4** - À la fin du temps, le résultat est automatiquement annoncé.", inline=False)
+                "!sondage --> !aideSonsage *(réserver administrateur)*\n"
+                "!role --> !aideRole *(réserver administrateur)*\n"
+                "!informations --> pour en savoir plus sur le bot !", inline=False)
 
         #fin du message
         message.set_footer(text="Bot réalisé par @.shin60 :-)")
         await ctx.send(embed=message)
 
+    @commands.command(name="aideSondage")
+    @commands.has_permissions(administrator=True)
+    async def aideSondage(self, ctx):
+        message = discord.Embed(
+            title = "**La commande !sondage**",
+            description = 
+                "La commande !sondage permet de créer un sondage depuis vos DM !\n"
+                "En DM il vous sera demandé le titre, puis les options, par la suite les émojies et la durée du sondage *en seconde*.\n"
+                "Le bot envoie le sondage dans le salon où __!sondage__ a été écrit. Dès que le timer est écoulé, le bot compte les résultats et désigne l'option gagnante.",
+            color = discord.Color.orange())
+        
+        message.set_footer(text="Pour plus d'information contacter @.shin60 :) ")
+        await ctx.send(embed=message)
+    
+    @commands.command(name="aideRole")
+    @commands.has_permissions(administrator=True)
+    async def aideRole(self, ctx) :
+        message = discord.Embed(
+            title = "**La commande !role",
+            description = 
+                "La commande !role permet de créer un message de rôle réaction\n"
+                " il faut donner l'association emoji - rôle sous ce format :\n"
+                "`emoji : rôle\n"
+                "Par exemple :\n"
+                "🦧 : 14\n"
+                "👦 : 15\n"
+                "Le message de rôle réaction sera envoyé dans me salon où la commande a été effectué\n"
+                "*Attention a bien écrire le nom du rôle. Dans le cas contraire le rôle réaction ne marchera pas !*",
+            color = discord.Color.dark_purple())
+
+        message.set_footer(text="Pour plus d'information contacter @.shin60 :) ")
+        await ctx.send(embed=message) 
 
     #######################
     #--- Commande role ---#
@@ -133,7 +152,7 @@ class GestionnaireCommande(commands.Cog):
             return m.author == ctx.author and isinstance(m.channel, discord.DMChannel)
 
         try:
-            await ctx.author.send("📝 Donne le **titre** du message de rôle :")
+            await ctx.author.send("Donne le **titre** du message de rôle :")
             titre = await self.bot.wait_for("message", check=check, timeout=60)
 
             await ctx.author.send("🧾 Donne la **description** (ou tape `skip` pour rien) :")
@@ -141,18 +160,24 @@ class GestionnaireCommande(commands.Cog):
             description = None if descriptionMessage.content.lower() == "skip" else descriptionMessage.content
 
             await ctx.author.send(
-                "Donne les rôles avec leurs émojis, un par ligne sous ce format :\n"
-                "`emoji : NomDuRôle`\n"
-                "Exemple :\n"
-                "🦧 : 14\n👦 : 15"
+                "Donner les rôles avec leurs émojis, un par ligne"
             )
 
             #...
 
         except Exception as e:
-            await ctx.author.send("❌ Une erreur est survenue. Vérifie bien ta saisie.")
+            await ctx.author.send(" Une erreur est survenue. Vérifie bien ta saisie.")
             print("Erreur dans la commande !role :", e)
 
 async def setup(bot):
     await bot.add_cog(GestionnaireCommande(bot))
     print("Gestionnaire de commande prêt.")
+
+
+##############################
+#--- commande information ---#
+##############################
+
+
+
+#commandes à faire: !role, !information, !message
