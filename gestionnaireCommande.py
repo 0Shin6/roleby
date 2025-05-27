@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import asyncio
+from gestionnaireRole import sauvegarder_config 
 
 class GestionnaireCommande(commands.Cog):
     def __init__(self, bot):
@@ -164,7 +165,7 @@ class GestionnaireCommande(commands.Cog):
 
             await ctx.author.send("Donner les rôles avec leurs émojis, un par ligne :")
             
-            lignes = await self.bot.wait_for("message", check=check, time=150)
+            lignes = await self.bot.wait_for("message", check=check, timeout=200)
             lignes = lignes.content.strip().split("\n")
 
             contenu = ""
@@ -176,11 +177,28 @@ class GestionnaireCommande(commands.Cog):
                     emoji = emoji.strip()
                     contenu += f"{emoji} : {nomRole}\n"
                     emojiRole[emoji] = nomRole
-            #...
             
+            embed = discord.Embed(
+                title=f"__**{titre.content}**__",
+                description=description or "Réagis avec l'émoji correspondant pour obtenir un rôle.",
+                color=discord.Color.orange()
+            )
+            embed.add_field(name="Rôles disponibles :", value=contenu, inline=False)
+            embed.set_footer(text="Bot réalisé par @.Shin60 :-)")
+
+            message = await ctx.channel.send(embed=embed)
+
+            for emoji in emojiRole.keys():
+                await message.add_reaction(emoji)
+
+            gestionnaire = self.bot.get_cog("GestionnaireRole")
+            if gestionnaire:
+                gestionnaire.set_config(ctx.guild.id, "idMessageRole", message.id)
+
+            await ctx.author.send("Le message de rôle a bien été envoyé.")
 
         except Exception as e:
-            await ctx.author.send(" Une erreur est survenue. Vérifie bien ta saisie.")
+            await ctx.author.send(" Une erreur est survenue. Vérifie bien la saisie.")
             print("Erreur dans la commande !role :", e)
 
     ##############################
@@ -191,7 +209,7 @@ class GestionnaireCommande(commands.Cog):
         message = discord.Embed(
             title = "**Informations sur le bot**",
             description = 
-                "Salut, je suis le bot du serveur Robynet créer par , un youtubeur qui développe un communauté autour du développement personnel.\n"
+                "Salut, je suis le bot du serveur Robynet créer par un youtubeur qui développe une communauté autour du développement personnel.\n"
                 "Mon but est globalement de gérer les rôles via notamment les rôles réactions.\n"
                 "De plus, le bot pourra à l'avenir gérer les niveaux, la boutique et également pouvoir organiser des concours.\n"
                 "Je suis entièrement développé par @.shin60. Si vous voulez plus d'informations relatives au bot ou alors le contacter pour en créer un n'hésitez pas !",
