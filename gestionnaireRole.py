@@ -61,6 +61,10 @@ class GestionnaireRole(commands.Cog):
         if isinstance(idMessageRoles, int):
             idMessageRoles = [idMessageRoles]
 
+        idMessageRoles = config.get("idMessageRole", [])
+        if isinstance(idMessageRoles, int):
+            idMessageRoles = [idMessageRoles]
+
         if payload.message_id not in idMessageRoles:
             return None
         try:
@@ -124,19 +128,23 @@ class GestionnaireRole(commands.Cog):
             salonRole = discord.utils.get(guild.text_channels, id=config.get("idSalonRole"))
             salonVerif = discord.utils.get(guild.text_channels, id=config.get("idSalonVerification"))
 
-            if not config.get("idMessageRole"):
+            idMessages = config.get("idMessageRole", [])
+            if isinstance(idMessages, int):
+                idMessages = [idMessages]
+
+            if not idMessages:
                 if salonRole:
                     await self.creationMessageRole(salonRole, guild.id)
                 else:
                     print(f"Salon de rôles introuvable pour le serveur {guild.name}")
-
             else:
-                try:
-                    await salonRole.fetch_message(config.get("idMessageRole"))
-                    print("Message de rôles existant récupéré.")
-                except Exception as e:
-                    print("Message de rôles non trouvé, recréation...", e)
-                    await self.creationMessageRole(salonRole, guild.id)
+                for msg_id in idMessages:
+                    try:
+                        await salonRole.fetch_message(msg_id)
+                        print(f"Message de rôles existant récupéré (ID: {msg_id}).")
+                    except Exception as e:
+                        print(f"Message de rôles non trouvé (ID: {msg_id}), recréation...", e)
+                        await self.creationMessageRole(salonRole, guild.id)
 
             if not config.get("idVerification"):
                 if salonVerif:
