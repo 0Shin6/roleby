@@ -147,12 +147,13 @@ class GestionnaireCommande(commands.Cog):
     #--- Commande role ---#
     #######################
     @commands.command(name="role")
-    @commands.has_permissions(administrator=True)
+    @commands.has_permissions(administrator=True) #seul les membres ayant la permission administrateur peuvent executer cette commande
     async def creationMessageRole(self, ctx):
         def check(m):
             return m.author == ctx.author and isinstance(m.channel, discord.DMChannel)
 
         try:
+            #Envoie de la procédure de création du message en DM de l'auteur
             await ctx.author.send("Donne le **titre** du message de rôle :")
             titre = await self.bot.wait_for("message", check=check, timeout=60)
 
@@ -178,6 +179,7 @@ class GestionnaireCommande(commands.Cog):
                     contenu += f"{emoji} : {nomRole}\n"
                     emojiRole[emoji] = nomRole
             
+            #Création du message de rôle
             embed = discord.Embed(
                 title=f"__**{titre.content}**__",
                 description=description or "Réagis avec l'émoji correspondant pour obtenir un rôle.",
@@ -193,7 +195,15 @@ class GestionnaireCommande(commands.Cog):
 
             gestionnaire = self.bot.get_cog("GestionnaireRole")
             if gestionnaire:
-                gestionnaire.set_config(ctx.guild.id, "idMessageRole", message.id)
+                #On récupère les id message déjà enregistré
+                config = gestionnaire.get_config(ctx.guild.id)
+                idEnregistrees = config.get("idMessageRole", [])
+                if not isinstance(idEnregistrees, list):
+                    idEnregistrees = [idEnregistrees]
+
+                #On ajoute le nouveau message
+                idEnregistrees.append(message.id)
+                gestionnaire.set_config(ctx.guild.id, "idMessageRole", idEnregistrees)
 
             await ctx.author.send("Le message de rôle a bien été envoyé.")
 

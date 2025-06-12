@@ -6,4 +6,7 @@ def dictionnaireEmojies():
         "🗿" : "16",
         "💪" : "17",
         "👨‍🦰" : "18+",
+        "📞"  : "Notif'Call",
+        "🎉"  : "Notif'Event",
+        "🗺️"  : "Notif'Serveur",
     }

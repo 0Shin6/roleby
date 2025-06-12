@@ -28,11 +28,19 @@ class GestionnaireRole(commands.Cog):
         return self.configs.get(str(guild_id), {})
 
     #2b - mets à jour la configuration des serveurs
-    def set_config(self, guild_id, key, value):
+    def set_config(self, guild_id, key, value, append=False):
         guild = str(guild_id)
         if guild not in self.configs:
             self.configs[guild] = {}
-        self.configs[guild][key] = value
+
+        if append and key in self.configs[guild]:
+            if isinstance(self.configs[guild][key], list):
+                self.configs[guild][key].append(value)
+            else:
+                self.configs[guild][key] = [self.configs[guild][key], value]
+        else:
+            self.configs[guild][key] = value
+
         sauvegarder_config(self.configs)
 
     #3a - ajout du rôle "non vérifié" aux nouveaux membres
@@ -49,7 +57,11 @@ class GestionnaireRole(commands.Cog):
     #3b - mise en place du gestionnaire de réaction
     async def gestionRoleReaction(self, payload, ajouter=True):
         config = self.get_config(payload.guild_id)
-        if payload.message_id != config.get("idMessageRole"):
+        idMessageRoles = config.get("idMessageRole", [])
+        if isinstance(idMessageRoles, int):
+            idMessageRoles = [idMessageRoles]
+
+        if payload.message_id not in idMessageRoles:
             return None
         try:
             serveur = self.bot.get_guild(payload.guild_id)
