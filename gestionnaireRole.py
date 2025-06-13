@@ -22,7 +22,7 @@ class GestionnaireRole(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.configs = charger_config()
-    
+
     #2a - prend l'ID des différents serveur où le bot se trouve
     def get_config(self, guild_id):
         return self.configs.get(str(guild_id), {})
@@ -132,19 +132,14 @@ class GestionnaireRole(commands.Cog):
             if isinstance(idMessages, int):
                 idMessages = [idMessages]
 
-            if not idMessages:
-                if salonRole:
-                    await self.creationMessageRole(salonRole, guild.id)
-                else:
-                    print(f"Salon de rôles introuvable pour le serveur {guild.name}")
-            else:
-                for msg_id in idMessages:
-                    try:
-                        await salonRole.fetch_message(msg_id)
-                        print(f"Message de rôles existant récupéré (ID: {msg_id}).")
-                    except Exception as e:
-                        print(f"Message de rôles non trouvé (ID: {msg_id}), recréation...", e)
-                        await self.creationMessageRole(salonRole, guild.id)
+            
+            for msg_id in idMessages:
+                try:
+                    await salonRole.fetch_message(msg_id)
+                    print(f"Message de rôles existant récupéré (ID: {msg_id}).")
+                except Exception as e:
+                    print(f"Message de rôles non trouvé (ID: {msg_id})", e)
+                       
 
             if not config.get("idVerification"):
                 if salonVerif:
@@ -160,38 +155,6 @@ class GestionnaireRole(commands.Cog):
                     print("Message de vérification non trouvé, recréation...", e)
                     await self.creationMessageVerification(salonVerif, guild.id)
 
-    #6b - création des messages rôle
-    async def creationMessageRole(self, salon, guild_id):
-        if salon is None:
-            print("Salon de rôle est None.")
-            return
-        try:
-            message = discord.Embed(
-                title="**__Sélectionne ton âge :__**",
-                description="__Sélectionne ton âge parmi :__\n\n"
-                            "🦧 : 14\n"
-                            "👦 : 15\n"
-                            "🗿 : 16\n"
-                            "💪 : 17\n"
-                            "👨‍🦰 : 18+",
-                color=discord.Color.orange()
-            )
-            message.set_footer(text="Bot réalisé par @.Shin60 :-)")
-
-            # Envoi de l'embed et récupération du message envoyé
-            message = await salon.send(embed=message)
-
-            # Ajout des réactions à ce message
-            for emoji in dictionnaireEmojies().keys():
-                await message.add_reaction(emoji)
-
-            # Sauvegarde de l'ID du message
-            self.set_config(guild_id, "idMessageRole", message.id)
-            print("Message de rôle envoyé.")
-        except Exception as e:
-            print("Erreur création message rôle :", e)
-
-
     #7 - Création message vérification
     async def creationMessageVerification(self, salon, guild_id):
         if salon is None:
@@ -199,11 +162,94 @@ class GestionnaireRole(commands.Cog):
             return None
         try:
             messageVerif = discord.Embed(
-                title="**__Vérification :__**",
-                description="Bienvenue ! Réagis avec ✅ pour être vérifié et accéder au serveur.",
+                title="**__Réglement du serveur :__**",
+                description=(
+                    "**Lisez attentivement ces règles. En réagissant, vous attestez les accepter et vous engagez à les respecter pour accéder au serveur.**"
+                ),
                 color=discord.Color.green()
             )
+
             messageVerif.set_footer(text="Bot réalisé par @.Shin60 :-)")
+
+            # Ajout des sections en tant que champs
+            messageVerif.add_field(
+                name="**__I. Respect et Courtoisie__**",
+                value=(
+                    "**Soyez respectueux envers tous les membres.**\n"
+                    "・Aucun harcèlement, discrimination, propos haineux ou attaques personnelles ne sera toléré.\n"
+                    "・Les débats doivent rester constructifs et polis.\n"
+                ),
+                inline=False
+            )
+            messageVerif.add_field(
+                name="**__II. Interdiction du Spam__**",
+                value=(
+                    "・Pas de messages répétitifs, flood ou envoi massif d'emojis.\n"
+                    "・Les publicités non autorisées (liens externes, serveurs Discord, etc.) sont interdites.\n"
+                ),
+                inline=False
+            )
+            messageVerif.add_field(
+                name="**__III. Contenus Appropriés__**",
+                value=(
+                    "・Tout contenu NSFW, violent, illégal ou contraire aux règles de Discord est interdit.\n"
+                    "・Respectez les droits d'auteur : pas de partage de contenus piratés.\n"
+                ),
+                inline=False
+            )
+            messageVerif.add_field(
+                name="**__IV. Bon Usage des Canaux__**",
+                value=(
+                    "・Utilisez les salons prévus à cet effet (ex : discussions jeux dans #jeux-vidéo, questions techniques dans #aide).\n"
+                    "・Vérifiez les descriptions des canaux avant de poster.\n"
+                ),
+                inline=False
+            )
+            messageVerif.add_field(
+                name="**__V. Langue Principale__**",
+                value=(
+                    "・Le français est la langue de communication par défaut.\n"
+                    "・Si un salon est dédié à une autre langue, respectez cette exception.\n"
+                ),
+                inline=False
+            )
+            messageVerif.add_field(
+                name="**__VI. Sujets Sensibles__**",
+                value=(
+                    "・Les discussions politiques ou religieuses trop inflammatoires sont à éviter pour préserver la sérénité du serveur.\n"
+                ),
+                inline=False
+            )
+            messageVerif.add_field(
+                name="**__VII. Protection de la Vie Privée__**",
+                value=(
+                    "・Ne partagez pas vos informations personnelles (nom complet, adresse, etc.).\n"
+                    "・Ne divulguez pas celles des autres membres sans leur accord explicite.\n"
+                ),
+                inline=False
+            )
+            messageVerif.add_field(
+                name="**__VIII. Âge Minimum__**",
+                value="・Conformément aux conditions de Discord, vous devez avoir au moins 13 ans pour participer.\n",
+                inline=False
+            )
+            messageVerif.add_field(
+                name="**__IX. Modération et Sanction__**",
+                value=(
+                    "・Les modérateurs interviennent à leur discrétion et leurs décisions sont sans appel.\n"
+                    "・En cas de problème, contactez un modérateur en message privé (pas d'appel public à la modération).\n"
+                    "・Toute tentative de contourner un avertissement, mute ou bannissement (comme un retour avec un autre compte) entraînera une exclusion définitive.\n"
+                ),
+                inline=False
+            )
+
+            # Ajout du message final d'acceptation
+            messageVerif.add_field(
+                name="__**Acceptation**__",
+                value="En réagissant avec ✅, vous acceptez ces règles sans réserve.",
+                inline=False
+            )
+
 
             message = await salon.send(embed=messageVerif)
             await message.add_reaction("✅")

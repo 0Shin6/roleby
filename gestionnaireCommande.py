@@ -14,7 +14,7 @@ class GestionnaireCommande(commands.Cog):
     async def sondage(self, ctx):
         def check(msg):
             return msg.author == ctx.author and isinstance(msg.channel, discord.DMChannel)
-    
+
         try:
             #Procédure de création du sondage fait en DM
             try:
@@ -74,7 +74,7 @@ class GestionnaireCommande(commands.Cog):
                 emoji = reaction.emoji
                 if emoji in emojis:
                     resultat[emoji] = reaction.count - 1
-            
+
             #déduction du gagnant
             if resultat:
                 gagnant = max(resultat.items(), key=lambda item: item[0])
@@ -86,7 +86,7 @@ class GestionnaireCommande(commands.Cog):
 
         except Exception as e:
             await ctx.author.send("Une erreur est survenue", e)                
-    
+
     ########################
     #--- Commandes aide ---#
     ########################
@@ -120,10 +120,10 @@ class GestionnaireCommande(commands.Cog):
                 "En DM il vous sera demandé le titre, puis les options, par la suite les émojies et la durée du sondage *en seconde*.\n"
                 "Le bot envoie le sondage dans le salon où __!sondage__ a été écrit. Dès que le timer est écoulé, le bot compte les résultats et désigne l'option gagnante.",
             color = discord.Color.orange())
-        
+
         message.set_footer(text="Pour plus d'information contacter @.shin60 :) ")
         await ctx.send(embed=message)
-    
+
     @commands.command(name="aideRole")
     @commands.has_permissions(administrator=True)
     async def aideRole(self, ctx) :
@@ -165,7 +165,7 @@ class GestionnaireCommande(commands.Cog):
                 description = descriptionMessage.content
 
             await ctx.author.send("Donner les rôles avec leurs émojis, un par ligne :")
-            
+
             lignes = await self.bot.wait_for("message", check=check, timeout=200)
             lignes = lignes.content.strip().split("\n")
 
@@ -178,7 +178,7 @@ class GestionnaireCommande(commands.Cog):
                     emoji = emoji.strip()
                     contenu += f"{emoji} : {nomRole}\n"
                     emojiRole[emoji] = nomRole
-            
+
             #Création du message de rôle
             embed = discord.Embed(
                 title=f"__**{titre.content}**__",
@@ -195,6 +195,7 @@ class GestionnaireCommande(commands.Cog):
 
             gestionnaire = self.bot.get_cog("GestionnaireRole")
             if gestionnaire:
+                
                 #On récupère les id message déjà enregistré
                 config = gestionnaire.get_config(ctx.guild.id)
                 idEnregistrees = config.get("idMessageRole", [])
@@ -203,7 +204,7 @@ class GestionnaireCommande(commands.Cog):
 
                 #On ajoute le nouveau message
                 idEnregistrees.append(message.id)
-                gestionnaire.set_config(ctx.guild.id, "idMessageRole", idEnregistrees)
+                gestionnaire.set_config(ctx.guild.id, "idMessageRole", message.id, append=True)
 
             await ctx.author.send("Le message de rôle a bien été envoyé.")
 
@@ -233,10 +234,5 @@ class GestionnaireCommande(commands.Cog):
 async def setup(bot):
     await bot.add_cog(GestionnaireCommande(bot))
     print("Gestionnaire de commande prêt.")
-
-
-   
-
-
 
 #commandes à faire: !role, !information, !message

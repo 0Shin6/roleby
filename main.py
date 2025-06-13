@@ -16,8 +16,8 @@ mon_token = os.getenv("mon_token")
 if mon_token is None:
     mon_token = "Erreur"
     print(mon_token)
-    raise ValueError(" Le token Discord est introuvable dans le fichier .env...")
-    
+    raise ValueError(" Le token Discord est introuvable dans le fichier .env")
+
 
 # 2 - Définir les intents
 intents = discord.Intents.all()
