@@ -4,10 +4,29 @@ import asyncio
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+from flask import Flask
+import threading
 import os
 
 from gestionnaireRole import GestionnaireRole  
 from gestionnaireCommande import GestionnaireCommande
+
+
+# 0 - connexion à un serveur web pour l'hebergement
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Bot Discord actif !"
+
+def run():
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
+
+def keep_alive():
+    thread = threading.Thread(target=run)
+    thread.start()
+
 
 # 1 - Chargement des variables d’environnement
 load_dotenv()
@@ -38,5 +57,6 @@ async def main():
 
 # Lancement du bot
 if __name__ == "__main__":
+    keep_alive()         # Lance le serveur Flask
     asyncio.run(main())
 
