@@ -10,6 +10,7 @@ class GestionnaireCommande(commands.Cog):
     ##########################
     #--- Commande sondage ---#
     ##########################
+    @commands.has_permissions(administrator=True)
     @commands.command(name="sondage")
     async def sondage(self, ctx):
         def check(msg):
@@ -215,7 +216,7 @@ class GestionnaireCommande(commands.Cog):
     ##############################
     #--- commande information ---#
     ##############################
-    @commands.command(name="information")
+    @commands.command(name="info")
     async def information(self, ctx) :
         message = discord.Embed(
             title = "**Informations sur le bot**",
