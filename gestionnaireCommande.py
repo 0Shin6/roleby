@@ -1,3 +1,4 @@
+import random
 import discord
 from discord.ext import commands
 import asyncio
@@ -229,7 +230,88 @@ class GestionnaireCommande(commands.Cog):
             color = discord.Color.blue())
 
         message.set_footer(text="Pour plus d'aide, faites !aide :)")
-        await ctx.send(embed=message) 
+        await ctx.send(embed=message)
+
+    ###########################
+    #--- commande giveaway ---#
+    ###########################
+    @commands.command(name="giveaway")
+    @commands.has_permissions(administrator=True)
+    async def giveaway(self, ctx) :
+        def check(msg):
+            return msg.author == ctx.author and isinstance(msg.channel, discord.DMChannel)
+
+        try:
+            try:
+                await ctx.author.send("Création du giveaway. Répondez aux questions ci-dessous.")
+            except discord.Forbidden:
+                await ctx.send("Je ne peux pas vous envoyer de message privé. Activez vos DMs et réessayez.")
+                return
+
+            # Prix
+            await ctx.author.send("Quel est le **prix** du giveaway ?")
+            messagePrix = await self.bot.wait_for('message', check=check, timeout=60)
+            prix = messagePrix.content
+
+            # Durée
+            await ctx.author.send("Quelle est la **durée** du giveaway (en **secondes**) ?")
+            messageDuree = await self.bot.wait_for('message', check=check, timeout=60)
+            duree = int(messageDuree.content)
+
+            # Nombre de gagnants
+            await ctx.author.send("Combien de **gagnants** ?")
+            messageGagnant = await self.bot.wait_for('message', check=check, timeout=60)
+            nbGagnant = int(messageGagnant.content)
+
+            # Emoji
+            await ctx.author.send("Quel emoji souhaitez-vous utiliser pour la participation ?")
+            messageEmojie = await self.bot.wait_for('message', check=check, timeout=60)
+            emoji = messageEmojie.content.strip()
+
+            # Création de l’embed
+            embed = discord.Embed(
+                title="🎉 GIVEAWAY 🎉",
+                description=f"récompense : **{prix}**\nRéagissez avec {emoji} pour participer !\nDurée : {duree} secondes",
+                color=discord.Color.gold()
+            )
+            embed.set_footer(text=f"Lancé par {ctx.author.display_name}")
+
+            # Envoi du message
+            messageGiveaway = await ctx.send(embed=embed)
+            await messageGiveaway.add_reaction(emoji)
+
+            await ctx.author.send("Giveaway lancé avec succès.")
+
+            # Attente de fin
+            await asyncio.sleep(duree)
+
+            # Analyse des participations
+            message = await ctx.channel.fetch_message(messageGiveaway.id)
+            reaction = discord.utils.get(message.reactions, emoji=emoji)
+
+            if not reaction:
+                await ctx.send("Aucun participant.")
+                return None
+
+            participants = await reaction.users().flatten()
+            participants = [u for u in participants if not u.bot]
+
+            if not participants:
+                await ctx.send("Aucun participant valide.")
+                return
+
+            if nbGagnant > len(participants):
+                nbGagnant = len(participants)
+
+            gagnants = random.sample(participants, nbGagnant)
+            mentions = ", ".join(user.mention for user in gagnants)
+
+            await ctx.send(f"Félicitations {mentions} ! Vous remportez **{prix}** !")
+
+        except asyncio.TimeoutError:
+            await ctx.author.send("Temps écoulé. Giveaway annulé.")
+        except Exception as e:
+            await ctx.author.send(f"Une erreur est survenue : {e}")
 
 
 async def setup(bot):
