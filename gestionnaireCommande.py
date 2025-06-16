@@ -235,5 +235,3 @@ class GestionnaireCommande(commands.Cog):
 async def setup(bot):
     await bot.add_cog(GestionnaireCommande(bot))
     print("Gestionnaire de commande prêt.")
-
-#commandes à faire: !role, !information, !message

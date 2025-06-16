@@ -55,7 +55,7 @@ async def main():
         await setup()
         await bot.start(mon_token) # type: ignore
 
-# Lancement du bot
+# 6 - Lancement du bot
 if __name__ == "__main__":
     keep_alive()         # Lance le serveur Flask
     asyncio.run(main())
