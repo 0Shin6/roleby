@@ -106,6 +106,7 @@ class GestionnaireCommande(commands.Cog):
             value = 
                 "!sondage --> !aideSonsage *(réserver administrateur)*\n"
                 "!role --> !aideRole *(réserver administrateur)*\n"
+                "!giveaway --> !aideGiveaway *(réserver administrateur)*\n"
                 "!informations --> pour en savoir plus sur le bot !", inline=False)
 
         #fin du message
@@ -214,24 +215,6 @@ class GestionnaireCommande(commands.Cog):
             await ctx.author.send(" Une erreur est survenue. Vérifie bien la saisie.")
             print("Erreur dans la commande !role :", e)
 
-    ##############################
-    #--- commande information ---#
-    ##############################
-    @commands.command(name="info")
-    async def information(self, ctx) :
-        message = discord.Embed(
-            title = "**Informations sur le bot**",
-            description = 
-                "Salut, je suis le bot du serveur Robynet créer par un youtubeur qui développe une communauté autour du développement personnel.\n"
-                "Mon but est globalement de gérer les rôles via notamment les rôles réactions.\n"
-                "De plus, le bot pourra à l'avenir gérer les niveaux, la boutique et également pouvoir organiser des concours.\n"
-                "Je suis entièrement développé par @.shin60. Si vous voulez plus d'informations relatives au bot ou alors le contacter pour en créer un n'hésitez pas !",
-
-            color = discord.Color.blue())
-
-        message.set_footer(text="Pour plus d'aide, faites !aide :)")
-        await ctx.send(embed=message)
-
     ###########################
     #--- commande giveaway ---#
     ###########################
@@ -293,7 +276,7 @@ class GestionnaireCommande(commands.Cog):
                 await ctx.send("Aucun participant.")
                 return None
 
-            participants = await reaction.users().flatten()
+            participants = [user async for user in reaction.users()]
             participants = [u for u in participants if not u.bot]
 
             if not participants:
@@ -313,6 +296,47 @@ class GestionnaireCommande(commands.Cog):
         except Exception as e:
             await ctx.author.send(f"Une erreur est survenue : {e}")
 
+    @commands.command(name="aideGiveaway")
+    @commands.has_permissions(administrator=True)
+    async def aideGiveaway(self, ctx) :
+        message = discord.Embed(
+            title = "**La commande !giveaway**",
+            description = 
+                "La commande !giveaway permet d'**organiser** un **tirage au sort** parmi les membres ayant réagi à un message.\n"
+                "Voici comment cela fonctionne :\n"
+                "L'entitèreté de la **procédure** se fait en **DM** :\n"
+                "・Vous devrez entrer le **titre du giveaway** (ex : Gagnez un Nitro !)\n"
+                "・Indiquez **le nombre de gagnants** (ex : 1 ou 3...)\n"
+                "・Précisez **la durée du giveaway** en secondes (ex : 3600 pour 1h)\n"
+                "・Choisissez l'**emoji de participation** (ex : 🎁 ou 🎉)\n"
+                "Le message de participation sera automatiquement envoyé dans le salon où la commande a été utilisée.\n"
+                "Une fois le temps écoulé, le bot tirera au sort le(s) gagnant(s) parmi ceux qui ont réagi avec l'emoji sélectionné.\n"
+                "*Assurez-vous que les membres puissent réagir au message pour participer au tirage !*",
+
+
+            color = discord.Color.gold())
+
+        message.set_footer(text="Pour plus d'aide, faites !aide :)")
+        await ctx.send(embed=message)
+
+
+    ##############################
+    #--- commande information ---#
+    ##############################
+    @commands.command(name="info")
+    async def information(self, ctx) :
+        message = discord.Embed(
+            title = "**Informations sur le bot**",
+            description = 
+                "Salut, je suis le bot du serveur Robynet créer par un youtubeur qui développe une communauté autour du développement personnel.\n"
+                "Mon but est globalement de gérer les rôles via notamment les rôles réactions.\n"
+                "De plus, le bot pourra à l'avenir gérer les niveaux, la boutique et également pouvoir organiser des concours.\n"
+                "Je suis entièrement développé par @.shin60. Si vous voulez plus d'informations relatives au bot ou alors le contacter pour en créer un n'hésitez pas !",
+
+            color = discord.Color.blue())
+
+        message.set_footer(text="Pour plus d'aide, faites !aide :)")
+        await ctx.send(embed=message)
 
 async def setup(bot):
     await bot.add_cog(GestionnaireCommande(bot))
