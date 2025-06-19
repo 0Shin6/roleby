@@ -8,6 +8,7 @@ from flask import Flask
 import threading
 import os
 
+from gestionnaireAide import GestionnaireAide
 from gestionnaireRole import GestionnaireRole  
 from gestionnaireCommande import GestionnaireCommande
 
@@ -48,6 +49,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def setup():
     await bot.add_cog(GestionnaireRole(bot))
     await bot.add_cog(GestionnaireCommande(bot))
+    await bot.add_cog(GestionnaireAide(bot))
 
 # 5 - Fonction principale (exécution du bot)
 async def main():
