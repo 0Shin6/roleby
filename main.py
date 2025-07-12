@@ -51,7 +51,7 @@ async def setup():
     await bot.add_cog(GestionnaireRole(bot))
     await bot.add_cog(GestionnaireCommande(bot))
     await bot.add_cog(GestionnaireAide(bot))
-    await bot.add_cog(GestionnaireCultureG(bot))
+    #await bot.add_cog(GestionnaireCultureG(bot))
 
 
 # 5 - Fonction principale (exécution du bot)
