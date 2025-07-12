@@ -9,6 +9,7 @@ import threading
 import os
 
 from gestionnaireAide import GestionnaireAide
+from gestionnaireCultureG import GestionnaireCultureG
 from gestionnaireRole import GestionnaireRole  
 from gestionnaireCommande import GestionnaireCommande
 
@@ -50,6 +51,8 @@ async def setup():
     await bot.add_cog(GestionnaireRole(bot))
     await bot.add_cog(GestionnaireCommande(bot))
     await bot.add_cog(GestionnaireAide(bot))
+    await bot.add_cog(GestionnaireCultureG(bot))
+
 
 # 5 - Fonction principale (exécution du bot)
 async def main():

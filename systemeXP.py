@@ -47,7 +47,7 @@ class SystemeXP(commands.Cog):
         self.doneeXP[identifiant]['xp'] += quantite
 
     # 4 - Calcul du niveau à partir de l’XP totale
-    def calculerNiveau(self, xp_total):
+    def calculerNiveau(self, totalXP):
         niveaux = 0
         XPrequis = 0
 
@@ -68,7 +68,7 @@ class SystemeXP(commands.Cog):
                 palier = 150
 
             XPrequis += palier
-            if xp_total >= XPrequis:
+            if totalXP >= XPrequis:
                 niveaux += 1
             else:
                 break
@@ -91,14 +91,14 @@ class SystemeXP(commands.Cog):
 
         # Liste des paliers avec le niveau minimum requis
         rolePalier = [
-            (100, "Unreal Viewer"),
-            (80, "Legend Viewer"),
-            (60, "Mythic Viewer"),
+            (100, "Godlike Viewer"),
+            (80, "Mythic Viewer"),
+            (60, "Legend Viewer"),
             (40, "Ace Viewer"),
-            (20, "Epic Viewer"),
+            (20, "Good Viewer"),
             (10, "Active Viewer"),
-            (5, "Common Viewer"),
-            (1, "Average Viewer"),
+            (5, "Middle Viewer"),
+            (1, "Viewer"),
         ]
 
         # Trouve le bon rôle à attribuer
@@ -106,3 +106,17 @@ class SystemeXP(commands.Cog):
         for niveauMin, nomRole in rolePalier:
             if niveau >= niveauMin:
                 nouveauRole = discord.utils.get(serveur.roles, name=nomRole)
+
+        # Si un rôle est trouvé, il est appliqué
+        if nouveauRole:
+            nomRole = [nom for _, nom in rolePalier]
+            ancienRole = [r for r in membre.roles if r.name in nomRole and r != nouveauRole]
+
+            await membre.remove_roles(*ancienRole)
+            if nouveauRole not in membre.roles:
+                await membre.add_roles(nouveauRole)
+
+async def setup(bot):
+    await bot.add_cog(SystemeXP(bot))
+    print("Gestionnaire de commande prêt.")
+ 

@@ -1,6 +1,9 @@
+from collections import defaultdict
 import random
 import discord
 from discord.ext import commands
+#from systemeXP import calculerNiveau
+
 import asyncio
 
 class GestionnaireCommande(commands.Cog):
@@ -244,6 +247,82 @@ class GestionnaireCommande(commands.Cog):
         except Exception as e:
             await ctx.author.send(f"Une erreur est survenue : {e}")
 
+    
+
+    ###############################
+    #--- Commandes !cg !cgetat ---#
+    ###############################
+    @commands.command(name="cg")
+    async def activationCultureG(self, ctx):
+        cog_cg = self.bot.get_cog("GestionnaireCultureG")
+        if cog_cg is None:
+            await ctx.send("Le système de culture générale n'est pas chargé.")
+            return None
+
+        activiter = cog_cg.GestionnaireCultureG
+        if activiter.is_running():
+            activiter.cancel()
+            await ctx.send("Questions de culture générale désactivées.")
+        else:
+            activiter.start()
+            await ctx.send("Questions de culture générale activées (toutes les 24h).")
+
+    @commands.command(name="cgetat")
+    async def etatCultureG(self, ctx):
+        cog_cg = self.bot.get_cog("GestionnaireCultureG")
+        if cog_cg is None:
+            await ctx.send("Le système de culture générale n'est pas chargé.")
+            return None
+
+        task = cog_cg.GestionnaireCultureG
+        if task.is_running() :
+            etat = "actif"
+        else :
+            etat = "inactif"
+        await ctx.send('Le système de culture generale est', etat)
+
+
+
+    #########################
+    #--- Commande !topxp ---#
+    #########################
+    @commands.command(name="topxp")
+    async def afficherTopXP(self, ctx):
+        self.donneesXP = defaultdict(lambda: {'xp': 0, 'niveau': 0})
+
+        
+        classement = sorted(self.donneesXP.items(), key=lambda x: x[1]['xp'], reverse=True)[:10]
+        messageClassement = discord.Embed(title="Classement XP", color=discord.Color.brand_green())
+
+        for rang, (identifiant, donnees) in enumerate(classement, 1):
+            utilisateur = self.bot.get_user(int(identifiant))
+            messageClassement.add_field(
+                name=f"{rang}. {utilisateur}",
+                value=f"XP : {donnees['xp']} | Niveau : {donnees['niveau']}",
+                inline=False
+            )
+
+        await ctx.send(embed=messageClassement)
+
+
+    ##########################
+    #--- Commande !niveau ---#
+    ##########################
+    @commands.command(name="niveau")
+    async def niveau(self, ctx, membre: discord.Member = None): # type: ignore
+        membre = membre or ctx.author
+        identifiant = str(membre.id)
+
+        xp = self.donneesXP[identifiant]['xp']
+        niveau = 0 #self.calculerNiveau(xp)
+
+        await ctx.send(f"{membre.mention} est au **niveau {niveau}** avec **{xp} XP**.")
+
+
 async def setup(bot):
     await bot.add_cog(GestionnaireCommande(bot))
     print("Gestionnaire de commande prêt.")
+ 
+
+
+ #!cg lancer / arrete les questions de culture generale
