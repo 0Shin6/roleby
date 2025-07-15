@@ -48,7 +48,7 @@ async def setup():
     await bot.add_cog(GestionnaireAide(bot))
     await bot.add_cog(GestionnaireRole(bot))
     await bot.add_cog(GestionnaireCommande(bot))
-    #await bot.add_cog(GestionnaireCultureG(bot))  # <--- Le principal concerné
+    #await bot.add_cog(GestionnaireCultureG(bot))
 
 # 5 - Démarrage
 async def main():
