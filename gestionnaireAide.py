@@ -21,10 +21,13 @@ class GestionnaireAide(commands.Cog):
         message.add_field(
             name="Pour quelle commande avez-vous besoin d'aide ?",
             value = 
-                "!sondage --> !aideSonsage *(réserver administrateur)*\n"
-                "!role --> !aideRole *(réserver administrateur)*\n"
-                "!giveaway --> !aideGiveaway *(réserver administrateur)*\n"
-                "!informations --> pour en savoir plus sur le bot !", inline=False)
+                "!sondage --> !aideSonsage *(réservé administrateur)*\n"
+                "!role --> !aideRole *(réservé administrateur)*\n"
+                "!giveaway --> !aideGiveaway *(réservé administrateur)*\n"
+                "!cg et !cgetat --> !aideCg *(réservé administrateur)*\n"
+                "!informations --> pour en savoir plus sur le bot !", 
+                
+                inline=False)
 
         #fin du message
         message.set_footer(text="Bot réalisé par @.shin60 :-)")
@@ -85,6 +88,25 @@ class GestionnaireAide(commands.Cog):
 
 
             color = discord.Color.gold())
+
+        message.set_footer(text="Pour plus d'aide, faites !aide :)")
+        await ctx.send(embed=message)
+
+
+    #########################
+    #--- Commande aideCg ---#
+    #########################
+    @commands.command(name="aideCg")
+    @commands.has_permissions(administrator=True)
+    async def aideCg(self, ctx) :
+        message = discord.Embed(
+            title = "**Les commande !cg et !cgetat**",
+            description = 
+                "La commande **!cg** permet d'activer ou de désactiver le système de culture générale. Pour connaître l'état actuel du système il suffit d'affectuer la commande **!etatcg**\n"
+                "A savoir que les questions de culture générale sont **renouvelé** toutes les **24h** à partir du moment où le système est **réactivé**. Les questions sont stockés dans un fichier alors pour le réalimentier, soummetez vos questions à @.shin60 pour les inhecter dans le fichier",
+
+
+            color = discord.Color.dark_grey())
 
         message.set_footer(text="Pour plus d'aide, faites !aide :)")
         await ctx.send(embed=message)

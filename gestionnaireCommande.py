@@ -176,12 +176,11 @@ class GestionnaireCommande(commands.Cog):
             await ctx.send("Le système de culture générale n'est pas chargé.")
             return None
 
-        activiter = cog_cg.GestionnaireCultureG
-        if activiter.is_running():
-            activiter.cancel()
+        if cog_cg.questionJournaliere.is_running():
+            cog_cg.questionJournaliere.cancel()
             await ctx.send("Questions de culture générale désactivées.")
         else:
-            activiter.start()
+            cog_cg.questionJournaliere.start()
             await ctx.send("Questions de culture générale activées (toutes les 24h).")
 
     @commands.command(name="cgetat")
@@ -191,12 +190,9 @@ class GestionnaireCommande(commands.Cog):
             await ctx.send("Le système de culture générale n'est pas chargé.")
             return None
 
-        task = cog_cg.GestionnaireCultureG
-        if task.is_running() :
-            etat = "actif"
-        else :
-            etat = "inactif"
-        await ctx.send('Le système de culture generale est', etat)
+        etat = "actif" if cog_cg.questionJournaliere.is_running() else "inactif"
+        await ctx.send(f"Le système de culture générale est **{etat}**.")
+
 
 
 

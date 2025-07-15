@@ -1,27 +1,5 @@
 [
   {
-    "question": "En quelle année l'homme a-t-il marché sur la lune ?",
-    "propositions": [
-      "1965",
-      "1969",
-      "1972"
-    ],
-    "reponse": "1969",
-    "questionPrecedente": "Quel est l’élément chimique dont le symbole est O ?",
-    "reponsePrecedente": "Oxygène"
-  },
-  {
-    "question": "Qui a écrit 'L'avare' ?",
-    "propositions": [
-      "Victor Hugo",
-      "Molière",
-      "Alexandre Dumas"
-    ],
-    "reponse": "Molière",
-    "questionPrecedente": "",
-    "reponsePrecedente": ""
-  },
-  {
     "question": "Quelle planète est la plus proche du Soleil ?",
     "propositions": [
       "Mercure",
@@ -29,8 +7,8 @@
       "Mars"
     ],
     "reponse": "Mercure",
-    "questionPrecedente": "",
-    "reponsePrecedente": ""
+    "questionPrecedente": "Qui a écrit 'L'avare' ?",
+    "reponsePrecedente": "Molière"
   },
   {
     "question": "Quel est le plus grand océan du monde ?",
