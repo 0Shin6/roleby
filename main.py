@@ -1,20 +1,13 @@
-# main.py – Le coeur du bot
-
+# main.py
+import os
 import asyncio
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 from flask import Flask
 import threading
-import os
 
-from gestionnaireAide import GestionnaireAide
-from gestionnaireCultureG import GestionnaireCultureG
-from gestionnaireRole import GestionnaireRole  
-from gestionnaireCommande import GestionnaireCommande
-
-
-# 0 - connexion à un serveur web pour l'hebergement
+# 0 - Serveur Web pour UptimeRobot
 app = Flask('')
 
 @app.route('/')
@@ -29,39 +22,40 @@ def keep_alive():
     thread = threading.Thread(target=run)
     thread.start()
 
-
-# 1 - Chargement des variables d’environnement
+# 1 - Chargement du .env
 load_dotenv()
 mon_token = os.getenv("mon_token")
 
-if mon_token is None:
-    mon_token = "Erreur"
-    print(mon_token)
-    raise ValueError(" Le token Discord est introuvable dans le fichier .env")
+if not mon_token:
+    raise ValueError("Token Discord manquant")
 
-
-# 2 - Définir les intents
+# 2 - Intents
 intents = discord.Intents.all()
-
-# 3 - Initialisation du bot
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# 4 - Fonction setup pour charger les Cogs
+# 3 - on_ready (pour voir les doublons)
+@bot.event
+async def on_ready():
+    print(f"Connecté en tant que {bot.user}")
+
+# 4 - Import et ajout des cogs
 async def setup():
+    from gestionnaireAide import GestionnaireAide
+    from gestionnaireCultureG import GestionnaireCultureG
+    from gestionnaireRole import GestionnaireRole
+    from gestionnaireCommande import GestionnaireCommande
+
+    await bot.add_cog(GestionnaireAide(bot))
     await bot.add_cog(GestionnaireRole(bot))
     await bot.add_cog(GestionnaireCommande(bot))
-    await bot.add_cog(GestionnaireAide(bot))
-    await bot.add_cog(GestionnaireCultureG(bot))
+    await bot.add_cog(GestionnaireCultureG(bot))  # <--- Le principal concerné
 
-
-# 5 - Fonction principale (exécution du bot)
+# 5 - Démarrage
 async def main():
     async with bot:
         await setup()
         await bot.start(mon_token) # type: ignore
 
-# 6 - Lancement du bot
 if __name__ == "__main__":
-    keep_alive()         # Lance le serveur Flask
+    keep_alive()  # lance le serveur Flask (une seule fois)
     asyncio.run(main())
-
