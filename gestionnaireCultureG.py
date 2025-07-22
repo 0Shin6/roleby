@@ -62,7 +62,7 @@ class GestionnaireCultureG(commands.Cog):
         # d - Prépare la prochaine question
         if questions:
             questions[0]["questionPrecedente"] = q
-            questions[0]["reponsePrecedente"] = questionActuelle["bonne_reponse"]
+            questions[0]["reponsePrecedente"] = questionActuelle["reponse"]
 
         self.sauvegardeQuestion(questions)
 

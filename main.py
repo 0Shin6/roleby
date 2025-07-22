@@ -4,28 +4,11 @@ import asyncio
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-from flask import Flask
-import threading
+from web import keep_alive
 from gestionnaireAide import GestionnaireAide
 from gestionnaireCultureG import GestionnaireCultureG
 from gestionnaireRole import GestionnaireRole
 from gestionnaireCommande import GestionnaireCommande
-
-
-# 0 - Serveur Web pour UptimeRobot
-app = Flask('')
-
-@app.route('/')
-def home():
-    return "Bot Discord actif !"
-
-def run():
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
-
-def keep_alive():
-    thread = threading.Thread(target=run)
-    thread.start()
 
 # 1 - Chargement du .env
 load_dotenv()
@@ -48,7 +31,7 @@ async def setup():
     await bot.add_cog(GestionnaireAide(bot))
     await bot.add_cog(GestionnaireRole(bot))
     await bot.add_cog(GestionnaireCommande(bot))
-    #await bot.add_cog(GestionnaireCultureG(bot))
+    await bot.add_cog(GestionnaireCultureG(bot))
 
 # 5 - Démarrage
 async def main():
