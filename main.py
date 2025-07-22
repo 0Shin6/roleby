@@ -6,6 +6,11 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from flask import Flask
 import threading
+from gestionnaireAide import GestionnaireAide
+from gestionnaireCultureG import GestionnaireCultureG
+from gestionnaireRole import GestionnaireRole
+from gestionnaireCommande import GestionnaireCommande
+
 
 # 0 - Serveur Web pour UptimeRobot
 app = Flask('')
@@ -40,11 +45,6 @@ async def on_ready():
 
 # 4 - Import et ajout des cogs
 async def setup():
-    from gestionnaireAide import GestionnaireAide
-    from gestionnaireCultureG import GestionnaireCultureG
-    from gestionnaireRole import GestionnaireRole
-    from gestionnaireCommande import GestionnaireCommande
-
     await bot.add_cog(GestionnaireAide(bot))
     await bot.add_cog(GestionnaireRole(bot))
     await bot.add_cog(GestionnaireCommande(bot))

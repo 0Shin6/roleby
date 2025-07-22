@@ -3,12 +3,15 @@ from discord.ext import tasks, commands
 import discord
 
 dataQuestions = "questions.json"
-idSalon = 1367798499260895335  
+idSalon = 1367798499260895335
 
 class GestionnaireCultureG(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.questionJournaliere.start()
+        self.task = self.questionJournaliere  
+
+    def get_task(self):
+        return self.task
 
     # 1 - Chargement des questions
     def chargerQuestion(self):
@@ -18,12 +21,12 @@ class GestionnaireCultureG(commands.Cog):
         except FileNotFoundError:
             return []
 
-    # 2 - sauvegarde du fichier question
+    # 2 - Sauvegarde du fichier question
     def sauvegardeQuestion(self, questions):
         with open(dataQuestions, "w", encoding="utf-8") as f:
             json.dump(questions, f, ensure_ascii=False, indent=2)
 
-    # 3 - gestion du renouvellement des questions
+    # 3 - Gestion du renouvellement des questions
     @tasks.loop(hours=24)
     async def questionJournaliere(self):
         salon = self.bot.get_channel(idSalon)
@@ -37,29 +40,29 @@ class GestionnaireCultureG(commands.Cog):
 
         questionActuelle = questions.pop(0)
 
-        # b - Affiche la réponse de la veille
+        # a - Affiche la réponse de la veille
         if "questionPrecedente" in questionActuelle and "reponsePrecedente" in questionActuelle:
             await salon.send(f"Réponse à la question précédente : **{questionActuelle['reponsePrecedente']}**")
 
-        # c - Prépare le message avec les propositions
+        # b - Affiche la nouvelle question avec sondage
         q = questionActuelle["question"]
         propositions = questionActuelle["propositions"]
-        texte = f"**Question du jour** : {q}\n\n"
+        texte = f"📢 **Question du jour** : {q}\n\n"
         emojis = ["1️⃣", "2️⃣", "3️⃣"]
 
-        for i, propositions in enumerate(propositions):
-            texte += f"{emojis[i]} {propositions}\n"
+        for i, proposition in enumerate(propositions):
+            texte += f"{emojis[i]} {proposition}\n"
 
         message = await salon.send(texte)
 
-        # d - Ajoute les réactions pour voter
+        # c - Réactions pour voter
         for emoji in emojis[:len(propositions)]:
             await message.add_reaction(emoji)
 
-        # e - Prépare la prochaine question
+        # d - Prépare la prochaine question
         if questions:
             questions[0]["questionPrecedente"] = q
-            questions[0]["reponsePrecedente"] = questionActuelle["reponse"]
+            questions[0]["reponsePrecedente"] = questionActuelle["bonne_reponse"]
 
         self.sauvegardeQuestion(questions)
 
@@ -67,6 +70,7 @@ class GestionnaireCultureG(commands.Cog):
     async def before_question(self):
         await self.bot.wait_until_ready()
 
+# 4 - Ajout du cog
 async def setup(bot):
     await bot.add_cog(GestionnaireCultureG(bot))
     print("Gestionnaire de culture G prêt.")
