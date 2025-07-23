@@ -8,10 +8,6 @@ idSalon = 1367798499260895335
 class GestionnaireCultureG(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.task = self.questionJournaliere  
-
-    def get_task(self):
-        return self.task
 
     # 1 - Chargement des questions
     def chargerQuestion(self):
