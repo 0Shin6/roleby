@@ -21,7 +21,6 @@ class GestionnaireAide(commands.Cog):
         message.add_field(
             name="Pour quelle commande avez-vous besoin d'aide ?",
             value = 
-                "!sondage --> !aideSonsage *(réservé administrateur)*\n"
                 "!role --> !aideRole *(réservé administrateur)*\n"
                 "!giveaway --> !aideGiveaway *(réservé administrateur)*\n"
                 "!cg et !cgetat --> !aideCg *(réservé administrateur)*\n"
@@ -33,19 +32,7 @@ class GestionnaireAide(commands.Cog):
         message.set_footer(text="Bot réalisé par @.shin60 :-)")
         await ctx.send(embed=message)
 
-    @commands.command(name="aideSondage")
-    @commands.has_permissions(administrator=True)
-    async def aideSondage(self, ctx):
-        message = discord.Embed(
-            title = "**La commande !sondage**",
-            description = 
-                "La commande !sondage permet de créer un sondage depuis vos DM !\n"
-                "En DM il vous sera demandé le titre, puis les options, par la suite les émojies et la durée du sondage *en seconde*.\n"
-                "Le bot envoie le sondage dans le salon où __!sondage__ a été écrit. Dès que le timer est écoulé, le bot compte les résultats et désigne l'option gagnante.",
-            color = discord.Color.orange())
 
-        message.set_footer(text="Pour plus d'information contacter @.shin60 :) ")
-        await ctx.send(embed=message)
 
     ############################
     # --- Commande aideRole ---#
@@ -103,7 +90,7 @@ class GestionnaireAide(commands.Cog):
             title = "**Les commande !cg et !cgetat**",
             description = 
                 "La commande **!cg** permet d'activer ou de désactiver le système de culture générale. Pour connaître l'état actuel du système il suffit d'affectuer la commande **!etatcg**\n"
-                "A savoir que les questions de culture générale sont **renouvelé** toutes les **24h** à partir du moment où le système est **réactivé**. Les questions sont stockés dans un fichier alors pour le réalimentier, soummetez vos questions à @.shin60 pour les inhecter dans le fichier",
+                "A savoir que les questions de culture générale sont **renouvelé** toutes les **24h** à partir du moment où le système est **réactivé**. Les questions sont stockés dans un fichier alors pour le réalimentier, soummetez vos questions à @.shin60 pour les injecter dans le fichier",
 
 
             color = discord.Color.dark_grey())

@@ -1,27 +1,5 @@
 [
   {
-    "question": "Quelle planète est la plus proche du Soleil ?",
-    "propositions": [
-      "Mercure",
-      "Vénus",
-      "Mars"
-    ],
-    "reponse": "Mercure",
-    "questionPrecedente": "Qui a écrit 'L'avare' ?",
-    "reponsePrecedente": "Molière"
-  },
-  {
-    "question": "Quel est le plus grand océan du monde ?",
-    "propositions": [
-      "Atlantique",
-      "Arctique",
-      "Pacifique"
-    ],
-    "reponse": "Pacifique",
-    "questionPrecedente": "",
-    "reponsePrecedente": ""
-  },
-  {
     "question": "Dans quel pays se trouve la tour de Pise ?",
     "propositions": [
       "Espagne",
@@ -29,8 +7,8 @@
       "France"
     ],
     "reponse": "Italie",
-    "questionPrecedente": "",
-    "reponsePrecedente": ""
+    "questionPrecedente": "Quel est le plus grand océan du monde ?",
+    "reponsePrecedente": "Pacifique"
   },
   {
     "question": "Quel est l’auteur de 'Harry Potter' ?",
