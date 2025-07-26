@@ -169,7 +169,7 @@ class GestionnaireCommande(commands.Cog):
     ###############################
     #--- Commandes !cg !cgetat ---#
     ###############################
-    @commands.command()
+    @commands.command("cg")
     @commands.has_permissions(administrator=True)
     async def cg(self, ctx):
         cog = self.bot.get_cog("GestionnaireCultureG")

@@ -23,7 +23,7 @@ class GestionnaireCultureG(commands.Cog):
             json.dump(questions, f, ensure_ascii=False, indent=2)
 
     # 3 - Gestion du renouvellement des questions
-    #@tasks.loop(hours=24)
+    @tasks.loop(hours=24)
     async def questionJournaliere(self):
         print("Système de culture générale activé")
         salon = self.bot.get_channel(idSalon)
@@ -63,7 +63,7 @@ class GestionnaireCultureG(commands.Cog):
 
         self.sauvegardeQuestion(questions)
 
-    #@questionJournaliere.before_loop
+    @questionJournaliere.before_loop
     async def before_question(self):
         await self.bot.wait_until_ready()
 
