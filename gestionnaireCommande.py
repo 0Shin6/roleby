@@ -169,19 +169,20 @@ class GestionnaireCommande(commands.Cog):
     ###############################
     #--- Commandes !cg !cgetat ---#
     ###############################
-    @commands.command(name="cg")
-    async def activationCultureG(self, ctx):
-        cog_cg = self.bot.get_cog("GestionnaireCultureG")
-        if cog_cg is None:
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def cg(self, ctx):
+        cog = self.bot.get_cog("GestionnaireCultureG")
+        if not cog:
             await ctx.send("Le système de culture générale n'est pas chargé.")
             return None
 
-        if cog_cg.questionJournaliere.is_running():
-            cog_cg.questionJournaliere.cancel()
-            await ctx.send("Questions de culture générale désactivées.")
+        if not cog.questionJournaliere.is_running():
+            cog.questionJournaliere.start()
+            await ctx.send("Questions de culture générale **activées** (toutes les 24h).")
         else:
-            cog_cg.questionJournaliere.start()
-            await ctx.send("Questions de culture générale activées (toutes les 24h).")
+            cog.questionJournaliere.cancel()
+            await ctx.send("Questions de culture générale **désactivées**.")
 
     @commands.command(name="cgetat")
     async def etatCultureG(self, ctx):
