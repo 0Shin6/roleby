@@ -83,14 +83,16 @@ class GestionnaireAide(commands.Cog):
     #########################
     #--- Commande aideCg ---#
     #########################
-    @commands.command(name="aideCg")
+    @commands.command(name="aidecg")
     @commands.has_permissions(administrator=True)
     async def aideCg(self, ctx) :
         message = discord.Embed(
-            title = "**Les commande !cg et !cgetat**",
+            title = "**Les commande !cg, !cgetat et !ajoutcg**",
             description = 
                 "La commande **!cg** permet d'activer ou de désactiver le système de culture générale. Pour connaître l'état actuel du système il suffit d'affectuer la commande **!etatcg**\n"
-                "A savoir que les questions de culture générale sont **renouvelé** toutes les **24h** à partir du moment où le système est **réactivé**. Les questions sont stockés dans un fichier alors pour le réalimentier, soummetez vos questions à @.shin60 pour les injecter dans le fichier",
+                "A savoir que les questions de culture générale sont **renouvelé** toutes les **24h** à partir du moment où le système est **réactivé**. Les questions sont stockés dans un fichier alors pour le réalimentier, il faut utiliser la commande !ajoutcg\n"
+                "La commande **!ajoutcg** permet d'ajouter une question de culture générale avec 3 proposition et la bonne réponse. Le bot vous guisera tout au long de la procédure",
+
 
 
             color = discord.Color.dark_grey())

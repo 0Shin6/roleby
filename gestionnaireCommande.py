@@ -201,6 +201,7 @@ class GestionnaireCommande(commands.Cog):
     #--- Commande ajoutcg ---#
     ##########################
     @commands.command(name="ajoutcg")
+    @commands.has_permissions(Administrator=True)
     async def ajoutcg(self, ctx):
             cg = self.bot.get_cog("GestionnaireCultureG")
             if not cg:
