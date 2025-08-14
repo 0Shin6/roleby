@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands
 #from systemeXP import calculerNiveau
 
+
 import asyncio
 
 class GestionnaireCommande(commands.Cog):
@@ -167,7 +168,7 @@ class GestionnaireCommande(commands.Cog):
     
 
     ###############################
-    #--- Commandes !cg !cgetat ---#
+    #--- Commandes cg & cgetat ---#
     ###############################
     @commands.command("cg")
     @commands.has_permissions(administrator=True)
@@ -196,6 +197,43 @@ class GestionnaireCommande(commands.Cog):
 
 
 
+    ##########################
+    #--- Commande ajoutcg ---#
+    ##########################
+    @commands.command(name="ajoutcg")
+    async def ajoutcg(self, ctx):
+            cg = self.bot.get_cog("GestionnaireCultureG")
+            if not cg:
+                await ctx.send("Le système de culture générale n'est pas chargé.")
+                return None
+            
+            def filtre(message):
+                return message.author == ctx.author and message.channel == ctx.channel
+
+            await ctx.send("Entrez l'intitulé de la question :")
+            messageQuestion = await self.bot.wait_for("message", check=filtre)
+            question = messageQuestion.content
+
+            propositions = []
+            for i in range(1, 4):
+                await ctx.send("Entrez la proposition", i, ":")
+                messageProposition = await self.bot.wait_for("message", check=filtre)
+                propositions.append(messageProposition.content)
+
+            await ctx.send("Entrez le numéro de la bonne réponse (1, 2 ou 3) :")
+            messageReponse = await self.bot.wait_for("message", check=filtre)
+            bonneReponse = propositions[int(messageReponse.content) - 1]
+
+            questions = cg.chargerQuestions()
+            questions.append({
+                "question": question,
+                "propositions": propositions,
+                "reponse": bonneReponse
+            })
+            cg.sauvegarderQuestions(questions)
+
+            await ctx.send("La question a été ajoutée avec succès !")
+            return "Une nouvelle question a été ajouté"
 
     #########################
     #--- Commande !topxp ---#
@@ -239,4 +277,3 @@ async def setup(bot):
  
 
 
- #!cg lancer / arrete les questions de culture generale
