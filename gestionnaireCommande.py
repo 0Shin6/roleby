@@ -13,9 +13,9 @@ class GestionnaireCommande(commands.Cog):
 
 
 
-    #######################
-    #--- Commande role ---#
-    #######################
+    ########################
+    #--- Commande !role ---#
+    ########################
     @commands.command(name="role")
     @commands.has_permissions(administrator=True) #seul les membres ayant la permission administrateur peuvent executer cette commande
     async def creationMessageRole(self, ctx):
@@ -84,13 +84,13 @@ class GestionnaireCommande(commands.Cog):
 
 
 
-    ###########################
-    #--- commande giveaway ---#
-    ###########################
+    ############################
+    #--- commande !giveaway ---#
+    ############################
     @commands.command(name="giveaway")
     @commands.has_permissions(administrator=True)
     async def giveaway(self, ctx) :
-        def check(msg):
+        def filtre(msg):
             return msg.author == ctx.author and isinstance(msg.channel, discord.DMChannel)
 
         try:
@@ -102,22 +102,22 @@ class GestionnaireCommande(commands.Cog):
 
             # Prix
             await ctx.author.send("Quel est le **prix** du giveaway ?")
-            messagePrix = await self.bot.wait_for('message', check=check, timeout=60)
+            messagePrix = await self.bot.wait_for('message', check=filtre, timeout=60)
             prix = messagePrix.content
 
             # Durée
             await ctx.author.send("Quelle est la **durée** du giveaway (en **secondes**) ?")
-            messageDuree = await self.bot.wait_for('message', check=check, timeout=60)
+            messageDuree = await self.bot.wait_for('message', check=filtre, timeout=60)
             duree = int(messageDuree.content)
 
             # Nombre de gagnants
             await ctx.author.send("Combien de **gagnants** ?")
-            messageGagnant = await self.bot.wait_for('message', check=check, timeout=60)
+            messageGagnant = await self.bot.wait_for('message', check=filtre, timeout=60)
             nbGagnant = int(messageGagnant.content)
 
             # Emoji
             await ctx.author.send("Quel emoji souhaitez-vous utiliser pour la participation ?")
-            messageEmojie = await self.bot.wait_for('message', check=check, timeout=60)
+            messageEmojie = await self.bot.wait_for('message', check=filtre, timeout=60)
             emoji = messageEmojie.content.strip()
 
             # Création de l’embed
@@ -167,9 +167,9 @@ class GestionnaireCommande(commands.Cog):
 
     
 
-    ###############################
-    #--- Commandes cg & cgetat ---#
-    ###############################
+    #################################
+    #--- Commandes !cg & !cgetat ---#
+    #################################
     @commands.command("cg")
     @commands.has_permissions(administrator=True)
     async def cg(self, ctx):
@@ -197,11 +197,11 @@ class GestionnaireCommande(commands.Cog):
 
 
 
-    ##########################
-    #--- Commande ajoutcg ---#
-    ##########################
+    ###########################
+    #--- Commande !ajoutcg ---#
+    ###########################
     @commands.command(name="ajoutcg")
-    @commands.has_permissions(Administrator=True)
+    @commands.has_permissions(administrator=True)
     async def ajoutcg(self, ctx):
             cg = self.bot.get_cog("GestionnaireCultureG")
             if not cg:
@@ -211,18 +211,18 @@ class GestionnaireCommande(commands.Cog):
             def filtre(message):
                 return message.author == ctx.author and message.channel == ctx.channel
 
-            await ctx.send("Entrez l'intitulé de la question :")
-            messageQuestion = await self.bot.wait_for("message", check=filtre)
+            await ctx.author.send("Entrez l'intitulé de la question :")
+            messageQuestion = await self.bot.wait_for('message', check=filtre, timeout=60)
             question = messageQuestion.content
 
             propositions = []
             for i in range(1, 4):
-                await ctx.send("Entrez la proposition", i, ":")
-                messageProposition = await self.bot.wait_for("message", check=filtre)
+                await ctx.author.send(f"Entrez la proposition {i}/3 :")
+                messageProposition = await self.bot.wait_for('message', check=filtre, timeout=60)
                 propositions.append(messageProposition.content)
 
-            await ctx.send("Entrez le numéro de la bonne réponse (1, 2 ou 3) :")
-            messageReponse = await self.bot.wait_for("message", check=filtre)
+            await ctx.author.send("Entrez le numéro de la bonne réponse (1, 2 ou 3) :")
+            messageReponse = await self.bot.wait_for('message', check=filtre, timeout=60)
             bonneReponse = propositions[int(messageReponse.content) - 1]
 
             questions = cg.chargerQuestions()
@@ -233,7 +233,7 @@ class GestionnaireCommande(commands.Cog):
             })
             cg.sauvegarderQuestions(questions)
 
-            await ctx.send("La question a été ajoutée avec succès !")
+            await ctx.author.send("La question a été ajoutée avec succès !")
             return "Une nouvelle question a été ajouté"
 
     #########################
