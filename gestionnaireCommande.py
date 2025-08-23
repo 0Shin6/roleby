@@ -203,38 +203,39 @@ class GestionnaireCommande(commands.Cog):
     @commands.command(name="ajoutcg")
     @commands.has_permissions(administrator=True)
     async def ajoutcg(self, ctx):
-            cg = self.bot.get_cog("GestionnaireCultureG")
-            if not cg:
-                await ctx.send("Le système de culture générale n'est pas chargé.")
-                return None
-            
-            def filtre(message):
-                return message.author == ctx.author and message.channel == ctx.channel
+        cg = self.bot.get_cog("GestionnaireCultureG")
+        if not cg:
+            await ctx.send("Le système de culture générale n'est pas chargé.")
+            return None
+        
+        def filtre(message):
+            return message.author == ctx.author and isinstance(message.channel, discord.DMChannel)
 
-            await ctx.author.send("Entrez l'intitulé de la question :")
-            messageQuestion = await self.bot.wait_for('message', check=filtre, timeout=60)
-            question = messageQuestion.content
+        await ctx.author.send("Entrez l'intitulé de la question :")
+        messageQuestion = await self.bot.wait_for('message', check=filtre, timeout=60)
+        question = messageQuestion.content
 
-            propositions = []
-            for i in range(1, 4):
-                await ctx.author.send(f"Entrez la proposition {i}/3 :")
-                messageProposition = await self.bot.wait_for('message', check=filtre, timeout=60)
-                propositions.append(messageProposition.content)
+        propositions = []
+        for i in range(1, 4):
+            await ctx.author.send(f"Entrez la proposition {i}/3 :")
+            messageProposition = await self.bot.wait_for('message', check=filtre, timeout=60)
+            propositions.append(messageProposition.content)
 
-            await ctx.author.send("Entrez le numéro de la bonne réponse (1, 2 ou 3) :")
-            messageReponse = await self.bot.wait_for('message', check=filtre, timeout=60)
-            bonneReponse = propositions[int(messageReponse.content) - 1]
+        await ctx.author.send("Entrez le numéro de la bonne réponse (1, 2 ou 3) :")
+        messageReponse = await self.bot.wait_for('message', check=filtre, timeout=60)
+        bonneReponse = propositions[int(messageReponse.content) - 1]
 
-            questions = cg.chargerQuestions()
-            questions.append({
-                "question": question,
-                "propositions": propositions,
-                "reponse": bonneReponse
-            })
-            cg.sauvegarderQuestions(questions)
+        questions = cg.chargerQuestion()
+        questions.append({
+            "question": question,
+            "propositions": propositions,
+            "reponse": bonneReponse
+        })
+        cg.sauvegardeQuestion(questions)
 
-            await ctx.author.send("La question a été ajoutée avec succès !")
-            return "Une nouvelle question a été ajouté"
+        await ctx.author.send("La question a été ajoutée avec succès !")
+
+        
 
     #########################
     #--- Commande !topxp ---#

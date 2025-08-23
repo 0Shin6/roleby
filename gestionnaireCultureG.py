@@ -1,26 +1,27 @@
 import json
 from discord.ext import tasks, commands
-import discord
+import os
 
-dataQuestions = "questions.json"
 idSalon = 1367798499260895335
 
 class GestionnaireCultureG(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.fichier = "questions.json"
 
     # 1 - Chargement des questions
     def chargerQuestion(self):
-        try:
-            with open(dataQuestions, "r", encoding="utf-8") as f:
+        if not os.path.exists(self.fichier):
+            return []  # si le fichier n’existe pas encore
+        with open(self.fichier, "r", encoding="utf-8") as f:
+            try:
                 return json.load(f)
-        except FileNotFoundError:
-            return []
+            except json.JSONDecodeError:
+                return []  # fichier vide ou corrompu
 
-    # 2 - Sauvegarde du fichier question
     def sauvegardeQuestion(self, questions):
-        with open(dataQuestions, "w", encoding="utf-8") as f:
-            json.dump(questions, f, ensure_ascii=False, indent=2)
+        with open(self.fichier, "w", encoding="utf-8") as f:
+            json.dump(questions, f, indent=4, ensure_ascii=False)
 
     # 3 - Gestion du renouvellement des questions
     @tasks.loop(hours=24)
