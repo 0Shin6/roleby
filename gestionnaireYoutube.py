@@ -1,10 +1,9 @@
 import feedparser
 import json
-import discord
 from discord.ext import commands, tasks
 
 idSalonAnnonce = 1367816840843235438
-fichier_de_suivi = "suiviYt.json"
+fichier = "suiviYt.json"
 chaines = {
     "chaine1": "UC6jU7Mx1cmcrtg_9tkuFp8A",
     "chaine2": "UClPmQpovGcEbnlxFX5HrAFg"
@@ -18,14 +17,14 @@ class GestionnaireYoutube(commands.Cog):
 
     def chargerVideo(self):
         try:
-            with open(fichier_de_suivi, "r", encoding="utf-8") as f:
+            with open(fichier, "r", encoding="utf-8") as f:
                 return json.load(f)
         except FileNotFoundError:
             return {}
     
-    def sauvegarde_fichier(self):
-        with open(fichier_de_suivi, "w", encoding="utf-8") as f:
-             json.dump(self.suivi, f, ensure_ascii=False, indent=2)
+    def sauvegardeFichier(self):
+        with open(fichier, "w", encoding="utf-8") as f:
+            json.dump(self.suivi, f, ensure_ascii=False, indent=2)
 
     @tasks.loop(minutes=10)
     async def verification(self):
@@ -34,17 +33,19 @@ class GestionnaireYoutube(commands.Cog):
             return None
         
         for nom, id_chaine in chaines.items():
-            url_rss = f"https://www.youtube.com/feeds/videos.xml?channel_id={id_chaine}"
-            flux = feedparser.parse(url_rss)
+            url = f"https://www.youtube.com/feeds/videos.xml?channel_id={id_chaine}"
+            flux = feedparser.parse(url)
 
-            if not flux.entries:
-                continue
+            if flux.entries:
+                derniere_video = flux.entries[0]
+                id_video = derniere_video.yt_videoid
+                lien = derniere_video.link
 
-            derniere_video = flux.entries[0]
-            id_video = derniere_video.yt_videoid
-            titre = derniere_video.title
-            lien = derniere_video.link
+                if self.suivi.get(id_chaine) != id_video:
+                    self.suivi[id_chaine] = id_video
+                    self.sauvegardeFichier()
+                    await salon.send(f"**{nom}** vient de sortir une nouvelle vidéo !\n{lien}")
 
-            if self.suivi.get(id_chaine) != id_video:
-                self.suivi[id_chaine] = id_video
-                await salon.send(f" **{nom}** viens de sortir une nouvelle vidéo !\n {titre}\n {lien}")
+    @verification.before_loop
+    async def before_verification(self):
+        await self.bot.wait_until_ready()
