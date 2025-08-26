@@ -18,8 +18,16 @@ class GestionnaireYoutube(commands.Cog):
     def chargerVideo(self):
         try:
             with open(fichier, "r", encoding="utf-8") as f:
-                return json.load(f)
+                contenu = f.read().strip()
+                if not contenu:
+                    self.sauvegardeFichier()  # crée {} dans le fichier
+                    return {}
+                return json.loads(contenu)
         except FileNotFoundError:
+            self.sauvegardeFichier()
+            return {}
+        except json.JSONDecodeError:
+            self.sauvegardeFichier()
             return {}
     
     def sauvegardeFichier(self):
