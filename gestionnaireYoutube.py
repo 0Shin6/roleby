@@ -20,19 +20,22 @@ class GestionnaireYoutube(commands.Cog):
             with open(fichier, "r", encoding="utf-8") as f:
                 contenu = f.read().strip()
                 if not contenu:
-                    self.sauvegardeFichier()  # crée {} dans le fichier
+                    self.sauvegardeFichier({})
                     return {}
                 return json.loads(contenu)
         except FileNotFoundError:
-            self.sauvegardeFichier()
+            self.sauvegardeFichier({})  
             return {}
         except json.JSONDecodeError:
-            self.sauvegardeFichier()
+            self.sauvegardeFichier({}) 
             return {}
-    
-    def sauvegardeFichier(self):
+
+    def sauvegardeFichier(self, data=None):
+        if data is None:
+            data = self.suivi
         with open(fichier, "w", encoding="utf-8") as f:
-            json.dump(self.suivi, f, ensure_ascii=False, indent=2)
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
 
     @tasks.loop(minutes=10)
     async def verification(self):
