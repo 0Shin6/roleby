@@ -89,7 +89,7 @@ class GestionnaireCommande(commands.Cog):
     ############################
     @commands.command(name="giveaway")
     @commands.has_permissions(administrator=True)
-    async def giveaway(self, ctx) :
+    async def giveaway(self, ctx):
         def filtre(msg):
             return msg.author == ctx.author and isinstance(msg.channel, discord.DMChannel)
 
@@ -123,7 +123,7 @@ class GestionnaireCommande(commands.Cog):
             # Création de l’embed
             embed = discord.Embed(
                 title="🎉 GIVEAWAY 🎉",
-                description=f"récompense : **{prix}**\nRéagissez avec {emoji} pour participer !\nDurée : {duree} secondes",
+                description=f"Récompense : **{prix}**\nRéagissez avec {emoji} pour participer !\nDurée : {duree} secondes",
                 color=discord.Color.gold()
             )
             embed.set_footer(text=f"Lancé par {ctx.author.display_name}")
@@ -134,31 +134,31 @@ class GestionnaireCommande(commands.Cog):
 
             await ctx.author.send("Giveaway lancé avec succès.")
 
-            # Attente de fin
-            await asyncio.sleep(duree)
+            # Tant qu'il n'y a pas de participant, le giveaway est relancé
+            while True:
+                await asyncio.sleep(duree)
 
-            # Analyse des participations
-            message = await ctx.channel.fetch_message(messageGiveaway.id)
-            reaction = discord.utils.get(message.reactions, emoji=emoji)
+                # Analyse des participations
+                message = await ctx.channel.fetch_message(messageGiveaway.id)
+                reaction = discord.utils.get(message.reactions, emoji=emoji)
 
-            if not reaction:
-                await ctx.send("Aucun participant.")
-                return None
+                participants = []
+                if reaction:
+                    participants = [user async for user in reaction.users() if not user.bot]
 
-            participants = [user async for user in reaction.users()]
-            participants = [u for u in participants if not u.bot]
+                if not participants:
+                    await ctx.send("Aucun participant... Le compte à rebours est réinitialisé")
+                    continue 
+                else:
+                    # Choix du gagnant
+                    if nbGagnant > len(participants):
+                        nbGagnant = len(participants)
 
-            if not participants:
-                await ctx.send("Aucun participant valide.")
-                return
+                    gagnants = random.sample(participants, nbGagnant)
+                    mentions = ", ".join(user.mention for user in gagnants)
 
-            if nbGagnant > len(participants):
-                nbGagnant = len(participants)
-
-            gagnants = random.sample(participants, nbGagnant)
-            mentions = ", ".join(user.mention for user in gagnants)
-
-            await ctx.send(f"Félicitations {mentions} ! Vous remportez **{prix}** !")
+                    await ctx.send(f"Félicitations {mentions} ! Vous remportez **{prix}** !")
+                    break  # sortie de la boucle
 
         except asyncio.TimeoutError:
             await ctx.author.send("Temps écoulé. Giveaway annulé.")
