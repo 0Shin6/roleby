@@ -10,6 +10,7 @@ from gestionnaireCultureG import GestionnaireCultureG
 from gestionnaireRole import GestionnaireRole
 from gestionnaireCommande import GestionnaireCommande
 from gestionnaireYoutube import GestionnaireYoutube
+from gestionnaireAntiSpam import GestionnaireAntiSpam
 
 # 1 - Chargement du .env
 load_dotenv()
@@ -34,6 +35,7 @@ async def setup():
     await bot.add_cog(GestionnaireCommande(bot))
     await bot.add_cog(GestionnaireCultureG(bot))
     await bot.add_cog(GestionnaireYoutube(bot))
+    await bot.add_cog(GestionnaireAntiSpam(bot))
 
 # 5 - Démarrage
 async def main():
