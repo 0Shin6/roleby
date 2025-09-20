@@ -5,8 +5,8 @@ from discord.ext import commands, tasks
 idSalonAnnonce = 1367816840843235438
 fichier = "suiviYt.json"
 chaines = {
-    "chaine1": "UC6jU7Mx1cmcrtg_9tkuFp8A",
-    "chaine2": "UClPmQpovGcEbnlxFX5HrAFg"
+    "Roby Dalier": "UC6jU7Mx1cmcrtg_9tkuFp8A",
+    "Roby Unfiltered": "UClPmQpovGcEbnlxFX5HrAFg"
 }
 
 class GestionnaireYoutube(commands.Cog):
@@ -20,14 +20,13 @@ class GestionnaireYoutube(commands.Cog):
             with open(fichier, "r", encoding="utf-8") as f:
                 contenu = f.read().strip()
                 if not contenu:
-                    self.sauvegardeFichier({})
                     return {}
                 return json.loads(contenu)
         except FileNotFoundError:
-            self.sauvegardeFichier({})  
+            # fichier inexistant donc on le crée
+            self.sauvegardeFichier({})
             return {}
         except json.JSONDecodeError:
-            self.sauvegardeFichier({}) 
             return {}
 
     def sauvegardeFichier(self, data=None):
