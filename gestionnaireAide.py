@@ -24,7 +24,7 @@ class GestionnaireAide(commands.Cog):
                 "!role --> !aideRole *(réservé administrateur)*\n"
                 "!giveaway --> !aideGiveaway *(réservé administrateur)*\n"
                 "!cg et !cgetat --> !aideCg *(réservé administrateur)*\n"
-                "!informations --> pour en savoir plus sur le bot !", 
+                "!info --> pour en savoir plus sur le bot !", 
                 
                 inline=False)
 
@@ -53,7 +53,7 @@ class GestionnaireAide(commands.Cog):
                 "*Attention a bien écrire le nom du rôle. Dans le cas contraire le rôle réaction ne marchera pas !*",
             color = discord.Color.dark_purple())
 
-        message.set_footer(text="Pour plus d'information contacter @.shin60 :) ")
+        message.set_footer(text="Pour plus d'information contacter @.shin60 <-- ")
         await ctx.send(embed=message) 
 
     @commands.command(name="aideGiveaway")
@@ -101,9 +101,9 @@ class GestionnaireAide(commands.Cog):
         await ctx.send(embed=message)
 
 
-    ##############################
-    #--- commande information ---#
-    ##############################
+    #######################
+    #--- commande info ---#
+    #######################
     @commands.command(name="info")
     async def information(self, ctx) :
         message = discord.Embed(
@@ -112,7 +112,7 @@ class GestionnaireAide(commands.Cog):
                 "Salut, je suis le bot du serveur Robynet créer par un youtubeur qui développe une communauté autour du développement personnel.\n"
                 "Mon but est globalement de gérer les rôles via notamment les rôles réactions.\n"
                 "De plus, le bot pourra à l'avenir gérer les niveaux, la boutique et également pouvoir organiser des concours.\n"
-                "Je suis entièrement développé par @.shin60. Si vous voulez plus d'informations relatives au bot ou alors le contacter pour en créer un n'hésitez pas !",
+                "Je suis entièrement développé par Shino. Si vous voulez plus d'informations relatives au bot ou alors le contacter pour en créer un n'hésitez pas !",
 
             color = discord.Color.blue())
 
