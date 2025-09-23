@@ -54,7 +54,7 @@ class GestionnaireYoutube(commands.Cog):
                 if self.suivi.get(id_chaine) != id_video:
                     self.suivi[id_chaine] = id_video
                     self.sauvegardeFichier()
-                    await salon.send(f"**{nom}** vient de sortir une nouvelle vidéo !\n{lien}")
+                    await salon.send(f"@Notif'youtube **{nom}** vient de sortir une nouvelle vidéo !\n{lien}")
 
     @verification.before_loop
     async def before_verification(self):
