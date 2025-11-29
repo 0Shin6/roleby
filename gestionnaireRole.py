@@ -172,7 +172,6 @@ class GestionnaireRole(commands.Cog):
 
             embed.set_footer(text="Bot réalisé par @.Shin60 :-)")
 
-            # Sections du règlement
             sections = [
                 """
                 **__CHARTE DU SERVEUR DISCORD__**\n

@@ -3,3 +3,4 @@
 mainTest.py
 .gitignore
 questions.json
+__pycache__/gestionnaireCommande.cpython-311.pyc

@@ -2,8 +2,6 @@ from collections import defaultdict
 import random
 import discord
 from discord.ext import commands
-#from systemeXP import calculerNiveau
-
 
 import asyncio
 
@@ -17,7 +15,7 @@ class GestionnaireCommande(commands.Cog):
     #--- Commande !role ---#
     ########################
     @commands.command(name="role")
-    @commands.has_permissions(administrator=True) #seul les membres ayant la permission administrateur peuvent executer cette commande
+    @commands.has_permissions(administrator=True)
     async def creationMessageRole(self, ctx):
         def check(m):
             return m.author == ctx.author and isinstance(m.channel, discord.DMChannel)
@@ -158,7 +156,7 @@ class GestionnaireCommande(commands.Cog):
                     mentions = ", ".join(user.mention for user in gagnants)
 
                     await ctx.send(f"Félicitations {mentions} ! Vous remportez **{prix}** !")
-                    break  # sortie de la boucle
+                    break 
 
         except asyncio.TimeoutError:
             await ctx.author.send("Temps écoulé. Giveaway annulé.")
@@ -257,25 +255,6 @@ class GestionnaireCommande(commands.Cog):
             )
 
         await ctx.send(embed=messageClassement)
-
-
-    ##########################
-    #--- Commande !niveau ---#
-    ##########################
-    @commands.command(name="niveau")
-    async def niveau(self, ctx, membre: discord.Member = None): # type: ignore
-        membre = membre or ctx.author
-        identifiant = str(membre.id)
-
-        xp = self.donneesXP[identifiant]['xp']
-        niveau = 0 #self.calculerNiveau(xp)
-
-        await ctx.send(f"{membre.mention} est au **niveau {niveau}** avec **{xp} XP**.")
-
-
-async def setup(bot):
-    await bot.add_cog(GestionnaireCommande(bot))
-    print("Gestionnaire de commande prêt.")
  
 
 
