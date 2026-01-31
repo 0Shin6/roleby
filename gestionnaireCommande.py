@@ -235,26 +235,3 @@ class GestionnaireCommande(commands.Cog):
 
         
 
-    #########################
-    #--- Commande !topxp ---#
-    #########################
-    @commands.command(name="topxp")
-    async def afficherTopXP(self, ctx):
-        self.donneesXP = defaultdict(lambda: {'xp': 0, 'niveau': 0})
-
-        
-        classement = sorted(self.donneesXP.items(), key=lambda x: x[1]['xp'], reverse=True)[:10]
-        messageClassement = discord.Embed(title="Classement XP", color=discord.Color.brand_green())
-
-        for rang, (identifiant, donnees) in enumerate(classement, 1):
-            utilisateur = self.bot.get_user(int(identifiant))
-            messageClassement.add_field(
-                name=f"{rang}. {utilisateur}",
-                value=f"XP : {donnees['xp']} | Niveau : {donnees['niveau']}",
-                inline=False
-            )
-
-        await ctx.send(embed=messageClassement)
- 
-
-

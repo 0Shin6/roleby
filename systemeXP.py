@@ -2,14 +2,40 @@ import discord
 from discord.ext import commands, tasks
 import asyncio
 from collections import defaultdict
+import aiosqlite
 
 class SystemeXP(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.doneeXP = defaultdict(lambda: {'xp': 0, 'niveau': 0})
         self.etatVocale = {}
-        self.idSalonNiveau = 1367621879090778286
+        self.idSalonNiveau = None
+        self.bot.loop.create_task(self.load_settings())
         self.gestionVocal.start()
+
+    async def load_settings(self):
+        default_channel_id = 1367621879090778286
+        async with aiosqlite.connect("bot.db") as db:
+            await db.execute("""
+                CREATE TABLE IF NOT EXISTS bot_settings (
+                    key TEXT PRIMARY KEY,
+                    value TEXT
+                )
+            """)
+            await db.execute(
+                "INSERT OR IGNORE INTO bot_settings (key, value) VALUES (?, ?)",
+                ("xp_level_channel_id", str(default_channel_id))
+            )
+            await db.commit()
+
+            cursor = await db.execute(
+                "SELECT value FROM bot_settings WHERE key = ?",
+                ("xp_level_channel_id",)
+            )
+            row = await cursor.fetchone()
+
+        if row and row[0]:
+            self.idSalonNiveau = int(row[0])
 
     # 1 - Ajout de 2 XP à chaque message
     @commands.Cog.listener()
